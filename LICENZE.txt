@@ -1,0 +1,15 @@
+plico - prova tecnica
+Componenti di terze parti contenuti in questa cartella
+
+lib/pdfjs/            pdf.js 6.4.299 (build legacy), Mozilla. Licenza Apache 2.0 (lib/pdfjs/LICENSE).
+                      Contiene i font standard Foxit e Liberation con le rispettive licenze.
+lib/embedpdf/         EmbedPDF snippet 2.15.1. Licenza MIT (lib/embedpdf/LICENSE).
+                      Include PDFium (Google), licenza Apache 2.0 / BSD.
+lib/o2p/              office2pdf 0.8.1, compilato in WebAssembly per questa prova. Licenza Apache 2.0 (lib/o2p/LICENSE).
+                      Include Typst 0.15 (Apache 2.0) e i suoi font incorporati (SIL OFL 1.1).
+lib/perfect-freehand.mjs  perfect-freehand 1.2.3, Steve Ruiz. Licenza MIT (lib/perfect-freehand.LICENSE).
+fonts/                Carlito e Liberation Sans/Serif: SIL Open Font License 1.1 (fonts/OFL-1.1.txt).
+                      Caladea: Apache 2.0.
+esempi/               Documenti pubblici raccolti nell'archivio di prova di Apache POI (test-data).
+                      Usati solo per questa prova, non vanno ridistribuiti.
+prova.pdf             Documento di esempio con testo fittizio, creato per questa prova.
