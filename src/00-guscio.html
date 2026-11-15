@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self' data: blob:; worker-src 'self' blob:; connect-src 'self' blob:{{CSP_DROPBOX}}; object-src 'none'; base-uri 'none'; form-action 'self'">
+<title>plico</title>
+<meta name="description" content="Leggi i PDF e scrivici sopra a mano">
+<meta name="theme-color" content="#E9EDEC">
+<meta name="color-scheme" content="light dark">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icone/plico.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icone/icona-192.png">
+<link rel="stylesheet" href="lib/pdfjs/pdf_viewer.css">
+<!--STILE-->
+<script>
+/* tema e avvio prima del primo disegno, per non avere lampi */
+(function () {
+  try { var t = localStorage.getItem('plico-tema'); if (t === 'chiaro' || t === 'scuro') document.documentElement.dataset.tema = t; } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<div id="app" aria-live="off"></div>
+<div class="area-avvisi"></div>
+<div id="avvio" aria-hidden="true">
+  <svg viewBox="0 0 64 64" width="96" height="96"><path d="M21 11h15l10 10v30a2 2 0 0 1-2 2H21a2 2 0 0 1-2-2V13a2 2 0 0 1 2-2z" fill="#E9EDEC"/><path d="M36 11v8a2 2 0 0 0 2 2h8z" fill="#CAD2D2"/><path class="segno" d="M24 41c3-7 6-7 7-1s3 7 6 0 4-5 6-2" fill="none" stroke="#C99A4E" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <span class="nome-app">plico</span>
+  <small>by <b>nautargo</b></small>
+</div>
+<script>
+/* splash: 1,10 s, non blocca i tocchi; spenta nelle impostazioni, con meno movimento o ricaricando nella stessa sessione */
+(function () {
+  var a = document.getElementById('avvio'), via = function () { a.remove(); };
+  var spenta = false;
+  try { spenta = localStorage.getItem('plico-splash') === 'no' || sessionStorage.getItem('plico-visto') === '1'; sessionStorage.setItem('plico-visto', '1'); } catch (e) {}
+  if (spenta || matchMedia('(prefers-reduced-motion: reduce)').matches) { via(); return; }
+  setTimeout(function () { a.classList.add('via'); setTimeout(via, 160); }, 1100);
+})();
+</script>
+<!--CODICE-->
+</body>
+</html>

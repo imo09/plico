@@ -1,0 +1,28 @@
+{
+  "name": "plico",
+  "short_name": "plico",
+  "description": "Leggi i PDF e scrivici sopra a mano",
+  "lang": "it",
+  "dir": "ltr",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#E9EDEC",
+  "theme_color": "#E9EDEC",
+  "icons": [
+    { "src": "icone/plico.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "icone/icona-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icone/icona-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icone/icona-maschera-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "share_target": {
+    "action": "./ricevi",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": { "files": [{ "name": "pdf", "accept": ["application/pdf", ".pdf"] }] }
+  },
+  "file_handlers": [
+    { "action": "./", "accept": { "application/pdf": [".pdf"] } }
+  ]
+}

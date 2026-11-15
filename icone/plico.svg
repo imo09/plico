@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="plico">
+  <rect width="64" height="64" rx="14" fill="#0E1D2A"/>
+  <path d="M21 11h15l10 10v30a2 2 0 0 1-2 2H21a2 2 0 0 1-2-2V13a2 2 0 0 1 2-2z" fill="#E9EDEC"/>
+  <path d="M36 11v8a2 2 0 0 0 2 2h8z" fill="#CAD2D2"/>
+  <path d="M24 41c3-7 6-7 7-1s3 7 6 0 4-5 6-2" fill="none" stroke="#C99A4E" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
