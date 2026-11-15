@@ -79,7 +79,7 @@ export function apriLivello(chiudi) {
   };
 }
 export function livelliAperti() { return pila.length; }
-export function chiudiTuttiLivelli() { while (pila.length) { const v = pila[pila.length - 1]; v.attivo = false; pila.pop(); v.chiudi(); popDaIgnorare++; history.back(); } }
+export function chiudiTuttiLivelli() { while (pila.length) { const v = pila.pop(); v.attivo = false; v.chiudi(); } }   // l'indirizzo è già cambiato: niente history.back()
 export function quandoFermo() { return popDaIgnorare ? new Promise(r => attesaFermo.push(r)) : Promise.resolve(); }
 export function gestisciPop() {   // true se il popstate era di un livello
   if (popDaIgnorare) { popDaIgnorare--; if (!popDaIgnorare) { const a = attesaFermo; attesaFermo = []; a.forEach(r => r()); } return true; }

@@ -553,7 +553,7 @@ function apriLivello(chiudi) {
   };
 }
 function livelliAperti() { return pila.length; }
-function chiudiTuttiLivelli() { while (pila.length) { const v = pila[pila.length - 1]; v.attivo = false; pila.pop(); v.chiudi(); popDaIgnorare++; history.back(); } }
+function chiudiTuttiLivelli() { while (pila.length) { const v = pila.pop(); v.attivo = false; v.chiudi(); } }   // l'indirizzo è già cambiato: niente history.back()
 function quandoFermo() { return popDaIgnorare ? new Promise(r => attesaFermo.push(r)) : Promise.resolve(); }
 function gestisciPop() {   // true se il popstate era di un livello
   if (popDaIgnorare) { popDaIgnorare--; if (!popDaIgnorare) { const a = attesaFermo; attesaFermo = []; a.forEach(r => r()); } return true; }
@@ -1070,7 +1070,13 @@ async function copiaBlob(blob, dest) {   // copia un Blob in un buffer già pron
   for (;;) { const { done, value } = await r.read(); if (done) break; dest.set(value, pos); pos += value.length; }
 }
 function cercaIndietro(file, ago) {   // ultima posizione di "ago" (bytes) nel file, -1 se manca
-  salta: for (let i = file.length - ago.length; i >= 0; i--) { for (let k = 0; k < ago.length; k++) if (file[i + k] !== ago[k]) continue salta; return i; }
+  let i = file.length - ago.length;
+  while (i >= 0) {
+    i = file.lastIndexOf(ago[0], i); if (i < 0) return -1;
+    let k = 1; while (k < ago.length && file[i + k] === ago[k]) k++;
+    if (k === ago.length) return i;
+    i--;
+  }
   return -1;
 }
 async function scomponi(file) {
@@ -1102,11 +1108,7 @@ async function scomponiBlob(file) {
   const coda = new Uint8Array(await file.slice(da).arrayBuffer());
   const esterno = { base: file, segni: [], plico: false };
   const qui = cercaIndietro(coda, enc.encode('%plico1 '));
-  if (qui < 0) {
-    if (!da) return esterno;
-    const r = await scomponi(new Uint8Array(await file.arrayBuffer()));   // blocco più grande di 16 MB: caso raro
-    return r.plico ? { ...r, base: file.slice(0, r.base.length) } : esterno;
-  }
+  if (qui < 0) return esterno;   // il blocco e l'aggiornamento di pdf.js stanno negli ultimi 16 MB (500 tratti pesano circa 0,19 MB)
   const dec = new TextDecoder('latin1');
   const fineRiga = coda.indexOf(0x0a, qui);
   if (fineRiga < 0) return esterno;
@@ -2099,7 +2101,7 @@ async function apri(idd, { ricarica = false } = {}) {
   D.bus.on('pagesinit', () => {
     D.v.currentScaleValue = stretto ? 'page-width' : 'auto';
     const p = limita(s.pagina || 1, 1, D.doc.numPages);
-    if (p > 1) D.v.currentPageNumber = p;
+    if (p > 1) D.v.currentPageNumber = p; else contenitore.scrollTop = 0;   // la prima pagina col suo margine in alto
     aggiornaIndicatore();
     zona.querySelector('.copertura')?.remove();
   });

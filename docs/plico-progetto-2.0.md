@@ -586,9 +586,9 @@ object-src 'none'; base-uri 'none'; form-action 'self'
 | Scomporre lo stesso PDF | meno di 0,20 s sul tablet | 0,01 s |
 | Peso aggiunto da 500 tratti | meno di 0,30 MB | 0,19 MB |
 | Libreria con 500 documenti | scorrimento fluido | - |
-| index.html | meno di 0,40 MB, font compresi | - |
-| PDF di 200 MB: prima pagina | meno di 3,00 s sul tablet | - |
-| PDF di 200 MB: comporre con 50 tratti | meno di 15,00 s sul tablet, senza chiusura della scheda | - |
+| index.html | meno di 0,40 MB, font compresi | 297 KB (15/11/2026) |
+| PDF di 200 MB: prima pagina | meno di 3,00 s sul tablet | 0,94 s con 198,24 MB (15/11/2026) |
+| PDF di 200 MB: comporre con 50 tratti | meno di 15,00 s sul tablet, senza chiusura della scheda | 1,52 s con 198,24 MB (15/11/2026) |
 
 ### I7. PDF grandi, fino a 200 MB
 
@@ -596,13 +596,13 @@ object-src 'none'; base-uri 'none'; form-action 'self'
 153c. **Leggere**: il PDF si apre a pezzi da 1 MB dal Blob dell'archivio (punto 129). Sul thread della pagina non c'è mai una copia intera del file. Il worker di pdf.js riserva lo spazio per il file intero, ma lo riempie solo con i pezzi letti.
 153d. **Importare**: l'impronta (SHA-256) richiede di leggere il file una volta; la lettura è temporanea e la memoria torna libera subito.
 153e. **Comporre**: `componi` riceve l'originale come Blob, lo copia una sola volta nel buffer che passa a pdf.js e usa l'impronta della scheda. Il risultato diventa subito un Blob. Picco previsto: circa 2-3 volte il peso del file [da verificare sul telefono con un PDF di 200 MB]. Se la composizione fallisce per memoria, l'app lo dice e propone "Salva una copia" dell'originale senza segni e "Riprova" (regola 15).
-153f. **Scomporre un file scaricato o importato**: `scomponiBlob` cerca il blocco plico negli ultimi 16 MB del file e prende l'originale come fetta del Blob, senza copiarlo.
+153f. **Scomporre un file scaricato o importato**: `scomponiBlob` cerca il blocco plico solo negli ultimi 16 MB del file e prende l'originale come fetta del Blob, senza copiarlo. Mai una ricerca su tutto il file [fatto: con un PDF di 198 MB l'importazione dura 1,09 s su PC].
 153g. **Tele**: punto 135b.
 153h. **Limiti detti nella Guida**: un PDF molto grande si apre più lentamente; su un telefono con poca memoria Condividi e Salva una copia di un PDF con segni possono non riuscire.
 
 ## L. Sincronizzazione con Dropbox (2.1)
 
-154. **Stato**: costruita il 15/11/2026, spenta finché manca la chiave dell'app. Le istruzioni di folio, quando arrivano, si confrontano con questa sezione (punto aperto 187); la chiave va in `src/versione.json` (punto 165b).
+154. **Stato**: costruita il 15/11/2026 e provata con un Dropbox finto e due dispositivi (`prove/sync.cjs`), spenta finché manca la chiave dell'app. Le istruzioni di folio, quando arrivano, si confrontano con questa sezione (punto aperto 187); la chiave va in `src/versione.json` (punto 165b).
 155. **Collegamento**: OAuth con PKCE dal browser, senza segreto, con `token_access_type=offline`. Il `code_verifier` e lo `state` restano in `impostazioni` durante il passaggio da Dropbox. Il token di rinnovo resta in `impostazioni.dropbox`. Indirizzo di ritorno: l'indirizzo della pagina (`https://plico.nautargo.com/`; per le prove anche `http://localhost:8080/`), registrato nell'app Dropbox. La chiave di un'app PKCE non è un segreto: può stare in `index.html`.
 156. **Cosa c'è su Dropbox**, nella cartella dell'app:
 

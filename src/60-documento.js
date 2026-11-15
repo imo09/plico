@@ -231,7 +231,7 @@ export async function apri(idd, { ricarica = false } = {}) {
   D.bus.on('pagesinit', () => {
     D.v.currentScaleValue = stretto ? 'page-width' : 'auto';
     const p = limita(s.pagina || 1, 1, D.doc.numPages);
-    if (p > 1) D.v.currentPageNumber = p;
+    if (p > 1) D.v.currentPageNumber = p; else contenitore.scrollTop = 0;   // la prima pagina col suo margine in alto
     aggiornaIndicatore();
     zona.querySelector('.copertura')?.remove();
   });
