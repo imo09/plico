@@ -71,8 +71,8 @@ function esitoRicerca({ matchesCount, state }) {
 export async function impostaStato(nuovo, { daUtente = false } = {}) {
   if (!D.aperto) return;
   if (daUtente) {
-    if (nuovo === 'lettura' && L.imp.haPenna) await impostaL('letturaScelta', true);
-    if (nuovo === 'scrittura') await impostaL('letturaScelta', false);
+    if (nuovo === 'lettura' && L.imp.haPenna) impostaL('letturaScelta', true);   // in memoria subito, sul disco dopo
+    if (nuovo === 'scrittura') impostaL('letturaScelta', false);
   }
   D.stato = nuovo;
   D.contenitore.classList.toggle('lettura', nuovo === 'lettura');
@@ -193,7 +193,7 @@ export async function apri(idd, { ricarica = false } = {}) {
   const stretto = stretta();
 
   const contenitore = el('div.visore.lettura', { tabindex: '-1' }, el('div.pdfViewer'));
-  const scriviBtn = el('button.tondo.scrivi', { type: 'button', 'aria-label': 'Scrivi', title: 'Scrivi', onclick: () => impostaStato('scrittura', { daUtente: true }) }, icona('penna'));
+  const scriviBtn = el('button.tondo.scrivi', { type: 'button', 'aria-label': 'Scrivi', title: 'Scrivi', hidden: true, onclick: () => impostaStato('scrittura', { daUtente: true }) }, icona('penna'));   // compare a documento pronto
   const zona = el('div.zona', null, contenitore, scriviBtn, el('div.copertura', { testo: 'Apro il documento' }));
   const titoli = el('button.titoli', { type: 'button', title: 'Rinomina', onclick: rinominaAperto }, el('span.titolo', { testo: s.nome }), el('span.salvataggio'));
   const puntini = bottoneIcona('puntini', 'Altre azioni', e => menuAperto(e.currentTarget));

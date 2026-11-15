@@ -41,6 +41,7 @@ export function giro() {
   return Y.inCorso;
 }
 async function unGiro() {
+  programma.annulla();   // questo giro porta con sé anche le modifiche in coda
   if (!navigator.onLine) { stato('senzaRete'); return; }
   if (L.imp.soloWifi && reteNota() && !['wifi', 'ethernet', 'unknown', ''].includes(tipoRete())) { stato('attesa'); return; }
   stato('inCorso');

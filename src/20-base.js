@@ -73,6 +73,7 @@ export function rimanda(f, ms) {   // esegue f dopo ms dall'ultima chiamata; .su
   const r = (...a) => { args = a; clearTimeout(t); t = setTimeout(() => { t = 0; f(...args); }, ms); };
   r.subito = () => { if (t) { clearTimeout(t); t = 0; return f(...(args || [])); } };
   r.inAttesa = () => !!t;
+  r.annulla = () => { clearTimeout(t); t = 0; };
   return r;
 }
 export const stretta = () => !matchMedia('(min-width: 720px)').matches;
