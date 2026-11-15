@@ -1,15 +1,34 @@
-plico - prova tecnica
-Componenti di terze parti contenuti in questa cartella
+plico 2.0 - by nautargo
+Componenti di terze parti contenuti in questo sito
 
 lib/pdfjs/            pdf.js 6.4.299 (build legacy), Mozilla. Licenza Apache 2.0 (lib/pdfjs/LICENSE).
-                      Contiene i font standard Foxit e Liberation con le rispettive licenze.
-lib/embedpdf/         EmbedPDF snippet 2.15.1. Licenza MIT (lib/embedpdf/LICENSE).
-                      Include PDFium (Google), licenza Apache 2.0 / BSD.
-lib/o2p/              office2pdf 0.8.1, compilato in WebAssembly per questa prova. Licenza Apache 2.0 (lib/o2p/LICENSE).
-                      Include Typst 0.15 (Apache 2.0) e i suoi font incorporati (SIL OFL 1.1).
-lib/perfect-freehand.mjs  perfect-freehand 1.2.3, Steve Ruiz. Licenza MIT (lib/perfect-freehand.LICENSE).
-fonts/                Carlito e Liberation Sans/Serif: SIL Open Font License 1.1 (fonts/OFL-1.1.txt).
-                      Caladea: Apache 2.0.
-esempi/               Documenti pubblici raccolti nell'archivio di prova di Apache POI (test-data).
-                      Usati solo per questa prova, non vanno ridistribuiti.
-prova.pdf             Documento di esempio con testo fittizio, creato per questa prova.
+                      Contiene i font standard Foxit e Liberation e le mappe dei caratteri (cmaps), con le rispettive licenze.
+src/35-freehand.js    perfect-freehand 1.2.3, Stephen Ruiz Ltd. Licenza MIT (testo qui sotto). Incluso in index.html.
+src/font/             Space Grotesk, Space Mono, Poppins (pacchetti @fontsource 5.3.0). SIL Open Font License 1.1.
+                      Inclusi in index.html.
+esempi/prova.pdf      Documento di esempio con testo fittizio, creato per plico.
+
+---- perfect-freehand: licenza MIT ----
+Copyright (c) 2021 Stephen Ruiz Ltd
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---- SIL Open Font License 1.1 ----
+Space Grotesk: Copyright 2020 The Space Grotesk Project Authors. Space Mono: Copyright 2016 Google Inc.
+Poppins: Copyright 2020 The Poppins Project Authors. Testo della licenza: https://openfontlicense.org
