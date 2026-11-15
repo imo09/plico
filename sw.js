@@ -1,5 +1,5 @@
 // plico - service worker. Memoria "plico-{versione}": l'app parte anche senza rete dalla seconda apertura.
-const VERSIONE = '2.0.0';
+const VERSIONE = '2.2.0';
 const MEMORIA = 'plico-' + VERSIONE;
 const ARRIVI = 'plico-arrivi';
 const SUBITO = ['./', 'index.html', 'manifest.webmanifest', 'icone/plico.svg', 'icone/icona-192.png', 'icone/icona-512.png', 'icone/icona-maschera-512.png',

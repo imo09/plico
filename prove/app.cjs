@@ -28,7 +28,7 @@ async function nuovaPagina(browser, opz = {}) {
 }
 const segniInArchivio = (p, doc) => p.evaluate(doc => new Promise((ok, ko) => {
   const r = indexedDB.open('plico'); r.onerror = () => ko(r.error);
-  r.onsuccess = () => { const t = r.result.transaction('segni').objectStore('segni').index('doc').getAll(doc); t.onsuccess = () => { ok(t.result.map(s => ({ id: s.id, eliminato: s.eliminato, strumento: s.strumento, pagina: s.pagina, n: s.punti?.length }))); r.result.close(); }; };
+  r.onsuccess = () => { const t = r.result.transaction('segni').objectStore('segni').index('doc').getAll(doc); t.onsuccess = () => { ok(t.result.map(s => ({ id: s.id, tipo: s.tipo, eliminato: s.eliminato, strumento: s.strumento, pagina: s.pagina, n: s.punti?.length, testo: s.testo, gruppo: s.gruppo, punti: s.punti ? Array.from(s.punti.slice(0, 2)) : null }))); r.result.close(); }; };
 }), doc);
 const docAperto = p => p.evaluate(() => (/^#doc-([a-z0-9]{8})$/.exec(location.hash) || [])[1]);
 async function attendiDocumento(p) { await p.waitForFunction(() => /^#doc-/.test(location.hash) && document.querySelector('.canvasWrapper canvas.tela-penna') || document.querySelector('.visore .page[data-loaded]'), null, { timeout: 15000 }); await p.waitForTimeout(400); }
@@ -102,14 +102,68 @@ const zigzag = (x0, y0, n = 20) => Array.from({ length: n }, (_, i) => [x0 + i *
     s = await segniInArchivio(p, docProva);
     vero(s.filter(x => !x.eliminato).length === 2, 'annulla: ' + JSON.stringify(s));
   });
-  await prova('evidenziatore con linea dritta, palmo ignorato vicino alla penna', async () => {
+  await prova('evidenziatore: a mano libera con linea dritta, agganciato al testo, palmo ignorato', async () => {
     await p.keyboard.press('e');
-    await tratto(p, [[0.2, 0.40], [0.3, 0.402], [0.4, 0.399], [0.5, 0.401]]);
+    await tratto(p, [[0.01, 0.50], [0.03, 0.502], [0.06, 0.499], [0.085, 0.501]]);   // nel margine: a mano libera
+    await tratto(p, [[0.33, 0.201], [0.5, 0.202], [0.62, 0.201]]);                       // sopra una riga di testo: agganciato
     await tratto(p, zigzag(0.6, 0.6), { tipo: 'touch', id: 9 });   // un dito subito dopo la penna: palmo
     await p.waitForTimeout(600);
     const s = await segniInArchivio(p, docProva);
-    vero(s.filter(x => x.strumento === 'evidenziatore').length === 1, 'evidenziatore: ' + JSON.stringify(s));
-    vero(s.length === 3, 'il palmo ha scritto: ' + s.length);
+    vero(s.filter(x => x.strumento === 'evidenziatore').length === 1, 'evidenziatore a mano: ' + JSON.stringify(s));
+    vero(s.filter(x => x.tipo === 'evidenzia').length === 1, 'evidenziatore sul testo: ' + JSON.stringify(s));
+    vero(s.length === 4, 'il palmo ha scritto: ' + s.length);
+    await p.keyboard.press('p');
+  });
+  await prova('testo con accenti ed euro, forma, Seleziona e sposta, tocco con due dita annulla', async () => {
+    await p.keyboard.press('t');
+    await tratto(p, [[0.1, 0.9], [0.1, 0.9]], { tipo: 'mouse', id: 1 });
+    await p.waitForSelector('.editor-testo textarea');
+    await p.keyboard.type('Prezzo 20 € già');
+    await tratto(p, [[0.5, 0.5], [0.5, 0.5]], { tipo: 'mouse', id: 1 });   // tocco fuori: conferma
+    await p.waitForTimeout(500);
+    let s = await segniInArchivio(p, docProva);
+    vero(s.some(x => x.tipo === 'testo' && x.testo === 'Prezzo 20 € già' && !x.eliminato), 'testo: ' + JSON.stringify(s.filter(x => x.tipo === 'testo')));
+    await p.keyboard.press('f');
+    await tratto(p, [[0.6, 0.62], [0.7, 0.66], [0.8, 0.7]]);
+    await p.waitForTimeout(400);
+    s = await segniInArchivio(p, docProva);
+    const forma = s.find(x => x.strumento === 'forma' && !x.eliminato);
+    vero(forma, 'forma: ' + JSON.stringify(s));
+    await p.keyboard.press('s');
+    await tratto(p, [[0.6, 0.62], [0.6, 0.62]]);
+    await p.waitForSelector('.sel-box');
+    await tratto(p, [[0.7, 0.62], [0.72, 0.6], [0.75, 0.58]]);
+    await p.waitForTimeout(500);
+    s = await segniInArchivio(p, docProva);
+    const forme = s.filter(x => x.strumento === 'forma');
+    vero(forme.length === 2 && forme.filter(x => !x.eliminato).length === 1 && forme.find(x => !x.eliminato).punti[0] > forma.punti[0], 'spostamento: ' + JSON.stringify(forme));
+    await p.waitForTimeout(800);   // lontano dall'ultimo segnale della penna, il dito conta
+    await p.evaluate(() => {
+      const c = document.querySelector('.visore'), r = c.getBoundingClientRect();
+      const ev = (n, id, x) => c.dispatchEvent(new PointerEvent(n, { pointerId: id, pointerType: 'touch', isPrimary: id === 21, clientX: r.left + x, clientY: r.top + 300, buttons: n === 'pointerup' ? 0 : 1, bubbles: true, cancelable: true }));
+      ev('pointerdown', 21, 300); ev('pointerdown', 22, 400); ev('pointerup', 21, 300); ev('pointerup', 22, 400);
+    });
+    await p.waitForTimeout(600);
+    s = await segniInArchivio(p, docProva);
+    const vive = s.filter(x => x.strumento === 'forma' && !x.eliminato);
+    vero(vive.length === 1 && vive[0].id === forma.id, 'annulla con due dita: ' + JSON.stringify(s.filter(x => x.strumento === 'forma')));
+    await p.keyboard.press('p');
+  });
+  await prova('immagine e firma inserite', async () => {
+    await p.click('[aria-label="Inserisci un\'immagine o la firma"]');
+    const [fc] = await Promise.all([p.waitForEvent('filechooser'), p.getByRole('menuitem', { name: 'Immagine' }).click()]);
+    await fc.setFiles(path.join(RADICE, 'icone/icona-192.png'));
+    await p.waitForSelector('text=Immagine inserita');
+    await p.click('[aria-label="Inserisci un\'immagine o la firma"]'); await p.getByRole('menuitem', { name: 'Firma' }).click();
+    await p.waitForSelector('.blocco-firma');
+    await p.evaluate(() => { const c = document.querySelector('.blocco-firma'), r = c.getBoundingClientRect();
+      const ev = (n, x, y) => c.dispatchEvent(new PointerEvent(n, { pointerId: 4, pointerType: 'pen', pressure: 0.5, buttons: n === 'pointerup' ? 0 : 1, clientX: r.left + x, clientY: r.top + y, bubbles: true }));
+      for (const y0 of [60, 100]) { ev('pointerdown', 30, y0); for (let i = 1; i < 20; i++) ev('pointermove', 30 + i * 10, y0 + (i % 3) * 8); ev('pointerup', 230, y0); } });
+    await p.getByRole('button', { name: 'Inserisci', exact: true }).click();
+    await p.waitForSelector('text=Firma inserita'); await p.waitForTimeout(500);
+    const s = await segniInArchivio(p, docProva);
+    vero(s.some(x => x.tipo === 'immagine'), 'immagine mancante');
+    const g = s.filter(x => x.gruppo && !x.eliminato); vero(g.length === 2 && g[0].gruppo === g[1].gruppo, 'firma: ' + JSON.stringify(g));
     await p.keyboard.press('p');
   });
   await prova('Salva una copia: PDF con blocco plico e annotazioni con autore plico (S4)', async () => {
@@ -126,6 +180,12 @@ const zigzag = (x0, y0, n = 20) => Array.from({ length: n }, (_, i) => [x0 + i *
       return a.map(x => x.titleObj?.str || x.title || '');
     }, b.toString('base64'));
     vero(autori.length >= 2 && autori.every(a => a === 'plico'), 'annotazioni: ' + JSON.stringify(autori));
+    const tipi = await p.evaluate(async b64 => {
+      const pdfjs = await import('./lib/pdfjs/pdf.min.mjs');
+      const doc = await pdfjs.getDocument({ data: Uint8Array.from(atob(b64), c => c.charCodeAt(0)), isEvalSupported: false }).promise;
+      return (await (await doc.getPage(1)).getAnnotations()).map(a => a.subtype + ':' + (a.contentsObj?.str || ''));
+    }, b.toString('base64'));
+    vero(tipi.some(x => x.startsWith('FreeText:Prezzo 20 € già')) && tipi.some(x => x.startsWith('Highlight')) && tipi.filter(x => x.startsWith('Stamp')).length >= 2, 'tipi: ' + JSON.stringify(tipi));
   });
   await prova('importare il PDF esportato: segni di nuovo modificabili (S8)', async () => {
     await p.click('.testa-doc [aria-label="Torna alla libreria"]');
@@ -135,7 +195,7 @@ const zigzag = (x0, y0, n = 20) => Array.from({ length: n }, (_, i) => [x0 + i *
     await p.waitForSelector('text=Importato: plico-copia');
     const id = await p.evaluate(() => new Promise(ok => { const r = indexedDB.open('plico'); r.onsuccess = () => { const g = r.result.transaction('documenti').objectStore('documenti').getAll(); g.onsuccess = () => ok(g.result.find(d => d.nome === 'plico-copia').id); }; }));
     const s = await segniInArchivio(p, id);
-    vero(s.filter(x => !x.eliminato).length === 3, 'segni importati: ' + JSON.stringify(s));
+    vero(s.filter(x => !x.eliminato).length === 9, 'segni importati: ' + JSON.stringify(s));
   });
   await prova('Cestino con Annulla (S5)', async () => {
     const scheda = p.locator('.scheda', { hasText: 'plico-copia' });
@@ -146,11 +206,75 @@ const zigzag = (x0, y0, n = 20) => Array.from({ length: n }, (_, i) => [x0 + i *
     await p.click('.avviso-azione');
     await p.waitForSelector('.scheda >> text=plico-copia');
   });
+  await prova('selezione multipla: due documenti spostati in una cartella nuova con l\'explorer', async () => {
+    await p.click('.testata .entra-sel');
+    const schede = p.locator('.scheda .apri'); await schede.nth(0).click(); await schede.nth(1).click();
+    await p.waitForSelector('text=2 selezionati');
+    await p.click('.azione-sel[aria-label="Sposta"]');
+    await p.getByRole('button', { name: 'Nuova cartella qui' }).click();
+    await p.fill('.foglio-piccolo input', 'Archivio'); await p.getByRole('button', { name: 'Crea' }).click();
+    await p.waitForSelector('.esplora-percorso >> text=Tutti i documenti / Archivio');
+    await p.getByRole('button', { name: 'Sposta qui' }).click();
+    await p.waitForSelector('text=Spostati 2 elementi in Archivio');
+    const n = await p.evaluate(() => new Promise(ok => { const r = indexedDB.open('plico'); r.onsuccess = () => { const t = r.result.transaction(['documenti', 'cartelle']); const d = t.objectStore('documenti').getAll(), c = t.objectStore('cartelle').getAll(); t.oncomplete = () => { const a = c.result.find(x => x.nome === 'Archivio'); ok(d.result.filter(x => x.cartella === a?.id).length); }; }; }));
+    vero(n === 2, 'documenti nella cartella: ' + n);
+  });
+  await prova('pannello Pagine: elimina una pagina, Annulla la rimette', async () => {
+    await p.goto(URL0 + '#doc-' + docProva); await attendiDocumento(p);
+    await p.click('.testa-doc [aria-label="Altre azioni"]'); await p.getByRole('menuitem', { name: 'Pagine' }).click();
+    await p.waitForSelector('.griglia-pagine');
+    await p.click('[aria-label="Azioni per la pagina 2"]'); await p.getByRole('menuitem', { name: 'Elimina la pagina' }).click();
+    await p.waitForFunction(() => document.querySelector('.indicatore')?.textContent.includes('/ 3'), null, { timeout: 15000 });
+    await p.waitForSelector('.foglio-pagine');   // il pannello si riapre da solo dopo ogni cambio
+    await p.click('.foglio-pagine >> text=Chiudi');
+    await p.click('.avviso-azione');
+    await p.waitForFunction(() => document.querySelector('.indicatore')?.textContent.includes('/ 4'), null, { timeout: 15000 });
+    const s = await segniInArchivio(p, docProva);
+    vero(s.filter(x => !x.eliminato).length >= 8, 'segni dopo Annulla: ' + s.filter(x => !x.eliminato).length);
+  });
+  await prova('doppio tocco in Lettura ingrandisce', async () => {
+    if (await p.isVisible('.barra-strumenti')) await p.click('[aria-label="Leggi"]');
+    const prima = await p.evaluate(() => document.querySelector('.page').getBoundingClientRect().width);
+    await p.evaluate(() => { const c = document.querySelector('.visore'), r = c.getBoundingClientRect();
+      const ev = (n) => c.dispatchEvent(new PointerEvent(n, { pointerId: 31, pointerType: 'touch', isPrimary: true, clientX: r.left + 400, clientY: r.top + 300, bubbles: true }));
+      ev('pointerdown'); ev('pointerup'); ev('pointerdown'); ev('pointerup'); });
+    await p.waitForTimeout(800);
+    const dopo = await p.evaluate(() => document.querySelector('.page').getBoundingClientRect().width);
+    vero(dopo > prima * 1.5, 'larghezza ' + prima + ' -> ' + dopo);
+  });
+  await prova('tele solo per le pagine in vista: al massimo 3, sotto 8 milioni di pixel (50 pagine)', async () => {
+    const { pdfVuoto } = await import(path.join(RADICE, 'src/41-vuoto.js'));
+    const f = path.join(require('os').tmpdir(), 'cinquanta.pdf'); fs.writeFileSync(f, pdfVuoto(50, 'righe'));
+    await p.goto(URL0 + '#libreria'); await p.waitForSelector('.libreria');
+    const [fc] = await Promise.all([p.waitForEvent('filechooser'), p.click('.testata .importa')]); await fc.setFiles(f);
+    await p.waitForSelector('text=Importato: cinquanta');
+    await p.click('.scheda >> text=cinquanta'); await attendiDocumento(p);
+    if (!(await p.isVisible('.barra-strumenti'))) await p.getByRole('button', { name: 'Scrivi', exact: true }).click();
+    let massimo = 0, pixel = 0;
+    for (let i = 0; i < 40; i++) {
+      await p.evaluate(() => { const c = document.querySelector('.visore'); c.scrollTop += c.clientHeight * 1.2; });
+      await p.waitForTimeout(120);
+      const m = await p.evaluate(() => { const t = [...document.querySelectorAll('canvas.tela-penna')].filter(c => c.width > 0); return [t.length, Math.max(0, ...t.map(c => c.width * c.height))]; });
+      massimo = Math.max(massimo, m[0]); pixel = Math.max(pixel, m[1]);
+    }
+    vero(massimo <= 3 && massimo >= 1, 'tele contemporanee: ' + massimo);
+    vero(pixel <= 8388608, 'pixel per tela: ' + pixel);
+  });
+  await prova('prova della penna: legge tipo e pressione', async () => {
+    await p.goto(URL0 + '#penna'); await p.waitForSelector('text=Prova la penna');
+    await p.evaluate(() => { const c = document.querySelector('.blocco-prova'), r = c.getBoundingClientRect();
+      const ev = (n, x) => c.dispatchEvent(new PointerEvent(n, { pointerId: 5, pointerType: 'pen', pressure: 0.42, buttons: n === 'pointerup' ? 0 : 1, clientX: r.left + x, clientY: r.top + 50, bubbles: true }));
+      ev('pointerdown', 20); ev('pointermove', 60); ev('pointermove', 90); });
+    const v = await p.textContent('.lettura-penna');
+    vero(v.includes('Penna') && v.includes('0,42'), 'lettura: ' + v);
+  });
   await prova('documento vuoto a righe, Aggiungi pagina, si apre in Scrittura', async () => {
+    await p.goto(URL0 + '#libreria'); await p.waitForSelector('.libreria');
     await p.click('.tondo.piu'); await p.getByRole('menuitem', { name: 'Nuovo documento vuoto' }).click();
     await p.getByRole('button', { name: /A righe/ }).click();
     await attendiDocumento(p);
     vero(await p.isVisible('.barra-strumenti'), 'non in Scrittura');
+    await p.keyboard.press('p');
     await tratto(p, zigzag(0.2, 0.2)); await p.waitForTimeout(500);
     await p.click('.testa-doc [aria-label="Altre azioni"]'); await p.getByRole('menuitem', { name: 'Aggiungi pagina' }).click();
     await p.waitForFunction(() => document.querySelector('.indicatore')?.textContent.includes('/ 2'), null, { timeout: 10000 });

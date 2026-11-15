@@ -1,6 +1,6 @@
 # plico 2.0 - progetto esecutivo
 
-Revisione 2 del 15/11/2026. Sostituisce la revisione del 14/11/2026 e la prima stesura "Progetto plico 2". Le novità sono riassunte nella sezione B2. Ha due lettori: Simo, per decidere (sezioni A-F, N e Punti aperti), e chi costruisce l'app, anche un modello IA meno capace di chi ha scritto il progetto (tutto il documento, appendici comprese).
+Revisione 3 del 15/11/2026. Sostituisce la revisione 2 dello stesso giorno, la revisione del 14/11/2026 e la prima stesura "Progetto plico 2". Le novità sono riassunte nelle sezioni B2 e B3. Ha due lettori: Simo, per decidere (sezioni A-F, N e Punti aperti), e chi costruisce l'app, anche un modello IA meno capace di chi ha scritto il progetto (tutto il documento, appendici comprese).
 
 Etichette: **[deciso]** scelto da Simo, o scelto qui su sua delega. **[fatto]** verificato con una prova il 14/11/2026. **[proposto]** scelta di progetto in attesa di conferma: si costruisce così, salvo indicazione contraria. **[aperto]** non deciso: non si costruisce finché non c'è risposta. **[da verificare]** va provato su un dispositivo vero.
 
@@ -52,6 +52,18 @@ I numeri fra parentesi dopo "regola" rimandano ai punti di `nautargo-identita.md
 | Solo con Wi-Fi | Sempre presente | Solo dove il browser dice il tipo di rete | Regola 37: nessuna voce che non funziona |
 | Costruzione | Una fase alla volta | Fasi 0, 1 e 2 insieme, la 2 senza chiave | Richiesta di Simo |
 
+### B3. Novità della revisione 3 (15/11/2026, versione 2.2.0)
+
+| Tema | Prima | Ora | Perché |
+|---|---|---|---|
+| Pagina nera scrivendo | Tela del tratto in corso "a bassa latenza"; tele per ogni pagina disegnata, fino a 16 milioni di pixel | Tela normale; tele solo per le pagine in vista (al massimo 3), fino a 8 milioni di pixel, liberate appena escono dallo schermo | Segnalazione di Simo: sul tablet la pagina diventava nera. Due cause probabili, corrette entrambe (punti 135b e 138) |
+| Fase 3 | Rimandata alla 2.2 | Costruita: Testo, Forme, Seleziona, firma e immagini, evidenziatore agganciato al testo, pannello Pagine, selezione multipla, doppio tocco, tocco con due dita, prova della penna | Richiesta di Simo |
+| Selezione multipla in libreria | Un documento alla volta | Pressione lunga, Ctrl o Maiusc, oppure "Seleziona"; sposta, preferiti, condividi, cestino; anche cartelle | Richiesta di Simo (23a) |
+| Scelta della cartella | Elenco rientrato | Explorer: si entra nelle cartelle, "Sposta qui", "Nuova cartella qui" | Comodo anche con molte cartelle |
+| Trascinamento | Solo PDF dal computer | Anche documenti e cartelle su una cartella del pannello, un riquadro o "Tutti i documenti" | Tablet e PC |
+| Marchio | Foglio con angolo piegato e segno ottone | Il plico legato: due fogli e un tratto a mano color ottone con un occhiello al posto del nodo (appendice A6) | Richiesta di Simo |
+| Versione | 2.0.0 | 2.2.0 | Contiene anche la fase 3 |
+
 7. **La correzione più importante**: nella prima stesura avevo scritto che il salvataggio di pdf.js perde la pressione della penna e che serviva uno scrittore PDF dedicato. Era vero solo per uno dei suoi percorsi. Rileggendo il codice e provando, pdf.js sa scrivere contorni pieni a spessore variabile: lo scrittore dedicato non serve più.
 
 ## C. Decisioni
@@ -71,6 +83,9 @@ I numeri fra parentesi dopo "regola" rimandano ai punti di `nautargo-identita.md
 | C11 | Marchio | Provvisorio: un foglio con un segno ottone (appendice A6) | [proposto] |
 | C12 | Numero di versione | 2.0.0 | [proposto] |
 | C13 | Dropbox | Una cartella con nomi leggibili, indice e un file di segni per documento | [deciso] 23a |
+| C16 | Fase 3 | Costruita insieme alla 2.0 | [deciso] |
+| C17 | Marchio | Il plico legato (appendice A6) | [proposto] |
+| C18 | Opzioni del testo | Solo dimensione e colore, Helvetica | [deciso] 24a |
 | C14 | Peso massimo | 200 MB per documento | [deciso] |
 | C15 | Apertura | A pezzi dal Blob dell'archivio | [deciso] 24a |
 
@@ -178,6 +193,9 @@ Riferimento visivo: canvas "Mock-up plico 2" (https://claude.ai/artifact/U3dN6Pe
 48. **Eliminare**: sposta nel Cestino e mostra "Spostato nel cestino [Annulla]" per 6 secondi. Nel Cestino: Ripristina oppure Elimina per sempre, con conferma dentro l'app. All'avvio plico elimina ciò che è nel Cestino da più di 30 giorni.
 49. **Eliminare una cartella**: i suoi documenti, anche nelle sottocartelle, vanno nel Cestino; Annulla riporta tutto. Un documento ripristinato quando la sua cartella non c'è più torna in Tutti i documenti.
 50. **Cerca**: filtra per nome in tutta la libreria, senza distinguere maiuscole e accenti; ogni risultato mostra la cartella.
+50b. **Selezione multipla** (2.2): pressione lunga su un documento o una cartella, Ctrl+clic o Maiusc+clic sul PC, oppure il pulsante "Seleziona". La barra in alto diventa "{n} selezionati" con Seleziona tutti, Sposta, Preferiti, Condividi, Cestino (nel Cestino: Ripristina, Elimina per sempre). Esc o la X escono. Il menu del documento resta sui tre puntini.
+50c. **Sposta** (2.2): scelta della cartella come in un explorer, con il percorso in alto, "Nuova cartella qui" e "Sposta qui". Una cartella non può andare dentro se stessa. Un solo avviso "Spostati {n} elementi [Annulla]".
+50d. **Trascinamento** (2.2, tablet e PC con mouse): documenti e cartelle selezionati si trascinano su una cartella del pannello, un riquadro di cartella o "Tutti i documenti" [da verificare con il dito sul tablet].
 51. **Ordinamento e vista**: Recenti (ultima apertura o modifica) oppure Per nome; griglia oppure elenco. All'inizio: elenco sulla disposizione stretta, griglia sulla larga. La scelta vale per tutta la libreria e si ricorda.
 52. **Stati vuoti** (regola 67): mai un riquadro vuoto; i testi sono nella tabella al punto 33. La libreria vuota offre il documento di prova `esempi/prova.pdf`.
 53. **Promemoria della copia**: riga discreta sopra i documenti quando l'ultima copia ha più di 30 giorni, ci sono documenti e Dropbox non è collegato.
@@ -216,7 +234,7 @@ Riferimento visivo: canvas "Mock-up plico 2" (https://claude.ai/artifact/U3dN6Pe
 66. **Scrivi con il dito**: interruttore nella barra, visibile solo se `haPenna`. Quando è acceso un dito scrive e due dita scorrono.
 67. **Tasto Indietro del telefono**: chiude un livello alla volta (regola 66): prima il foglio o il menu aperto, poi il documento, poi esce.
 
-### F5. Strumenti della 2.0
+### F5. Strumenti (2.0 e 2.2)
 
 68. **Barra**: sulla disposizione larga è verticale, sul lato destro (a sinistra per chi lo sceglie nelle Impostazioni); sulla stretta è orizzontale, in basso.
 
@@ -226,7 +244,11 @@ Riferimento visivo: canvas "Mock-up plico 2" (https://claude.ai/artifact/U3dN6Pe
 | 2 | Penna | Tratto che segue la pressione | P |
 | 3 | Evidenziatore | Colore che resta sotto il testo | E |
 | 4 | Gomma | Cancella il segno intero che tocca | G |
-| 5 | 3 colori rapidi | Gli ultimi 3 usati con lo strumento attivo | - |
+| 4b | Forme | Linea, freccia, rettangolo, ellisse tracciati trascinando; colore e spessore della penna (2.2) | F |
+| 4c | Testo | Tocca la pagina e scrivi; dimensione 8, 10, 12, 16, 24 punti; 6 colori della penna (2.2) | T |
+| 4d | Seleziona | Tocca un segno o trascina un riquadro; sposta, ridimensiona dagli angoli, colore, copia, elimina (2.2) | S |
+| 4e | Inserisci | Immagine (PNG, JPEG, WebP, ridotta a 1600 px per lato) o firma salvata (2.2) | - |
+| 5 | 3 colori rapidi | Gli ultimi 3 usati con lo strumento attivo (1 sola su schermi più bassi di 900 px) | - |
 | 6 | Spessore | Apre le opzioni dello strumento attivo | - |
 | 7 | Annulla, Ripeti | Fino a 200 passi, nella sessione | Ctrl+Z, Ctrl+Maiusc+Z |
 | 8 | Leggi | Torna alla Lettura | Esc |
@@ -238,13 +260,20 @@ Riferimento visivo: canvas "Mock-up plico 2" (https://claude.ai/artifact/U3dN6Pe
 73. **Raddrizza tenendo premuto**: se la punta resta ferma 0,60 secondi a fine tratto (spostamento sotto 3 px) e il tratto ha almeno 7 punti, diventa una linea retta dal primo punto alla punta, e continua a seguire la punta finché non si alza.
 74. **Linea dritta automatica**: al rilascio, se il tratto dell'evidenziatore è alto meno di 18 px e largo più di 30 px sullo schermo, diventa una linea orizzontale alla quota media.
 75. **Lo spessore è della carta, non dello schermo**: è in punti PDF, quindi ingrandendo la pagina il tratto appare più grosso, come inchiostro vero sotto una lente.
+75b. **Sul telefono** la barra mostra Penna, Evidenziatore, Gomma e un quarto pulsante "Altri strumenti" con Forme, Testo, Seleziona, Immagine, Firma; lo strumento scelto prende il suo posto.
+75c. **Testo** (2.2): un tocco apre un campo con la tastiera nel punto toccato; tocco fuori o Esc confermano. Toccando un testo esistente lo si corregge; la maniglia ottone lo sposta. Il testo vuoto si elimina. Solo i caratteri WinAnsi (lettere accentate italiane, euro) si vedono negli altri lettori: per gli altri plico avvisa.
+75d. **Seleziona** (2.2): i segni di una firma si muovono insieme (campo `gruppo`). Spostare, ridimensionare o cambiare colore crea segni nuovi e chiude i vecchi: annulla e unione fra dispositivi restano quelle di sempre. Canc elimina, Ctrl+D copia.
+75e. **Evidenziatore agganciato al testo** (2.2): se il tratto parte sopra una parola, segue le righe del testo (tipo `evidenzia`); se parte nel vuoto, è a mano libera. Interruttore nelle opzioni e nelle Impostazioni.
+75f. **Firma** (2.2): si disegna una volta in un riquadro, resta salvata sul dispositivo (`impostazioni.firma`) e si inserisce come tratti di penna raggruppati, larga circa 160 punti, al centro della pagina in vista.
+75g. **Doppio tocco** (2.2): in Lettura, e in Scrittura quando il dito scorre, ingrandisce al doppio attorno al punto; un secondo doppio tocco torna alla misura iniziale. **Tocco con due dita** (2.2): in Scrittura annulla l'ultimo passo.
 76. **Salvataggio**: ogni segno è salvato entro 0,30 secondi; uscendo dal documento o mandando l'app in secondo piano si salva subito. Sotto il nome compare "Salvato".
 
 ### F6. Menu del documento, ricerca, pagine
 
-77. **Menu con tre puntini** (ordine fisso, regola 68): Cerca nel testo, Vai alla pagina, Aggiungi pagina (solo nei documenti vuoti creati da plico); Rinomina, Sposta in una cartella, Aggiungi ai preferiti; Condividi, Salva una copia; Dettagli; Sposta nel cestino, per ultima.
+77. **Menu con tre puntini** (ordine fisso, regola 68): Cerca nel testo, Vai alla pagina, Pagine (2.2), Aggiungi pagina (solo nei documenti vuoti creati da plico); Rinomina, Sposta in una cartella, Aggiungi ai preferiti; Condividi, Salva una copia; Dettagli; Sposta nel cestino, per ultima.
 78. **Cerca nel testo**: barra con campo, "{i} di {n}", precedente, successivo, chiudi; i risultati sono evidenziati sulla pagina.
 79. **Vai alla pagina**: campo numerico con il totale accanto.
+79b. **Pagine** (2.2): miniature di tutte le pagine; per ognuna Sposta prima, Sposta dopo, Aggiungi pagina bianca dopo (della stessa misura), Elimina; in fondo "Aggiungi pagina bianca alla fine". Si usa `doc.extractPages` di pdf.js; il nuovo PDF diventa l'originale, i segni seguono le loro pagine (quelli di una pagina eliminata vanno chiusi). Ogni cambio ha Annulla.
 80. **Condividi**: genera il PDF con i segni e apre la condivisione del sistema; dove non c'è, lo scarica.
 81. **Salva una copia**: scarica il PDF con i segni, con il nome del documento.
 82. **Documento senza segni**: Condividi e Salva una copia danno il file originale, identico byte per byte.
@@ -311,7 +340,7 @@ Riferimento visivo: canvas "Mock-up plico 2" (https://claude.ai/artifact/U3dN6Pe
 98. **Scala del testo**: 12,5 - 14 - 15 - 16 - 18 - 22 - 28 px. Interlinea 1,35.
 99. **Misure**: bersagli di tocco di almeno 44 x 44 px; raggi 14 px (pulsanti), 20 px (schede, fogli, menu), 999 px (pillole); barra in alto 56 px; barra in basso 64 px più l'area sicura; pannello 264 px; barra strumenti 64 px.
 100. **Icone** (regola 71): a tratto, 24 x 24, spessore 1,7, estremità tonde, colore `currentColor`. Si riusano quelle della prova tecnica e dei mock-up.
-101. **Marchio** [proposto] (regola 56): un foglio Nebbia con l'angolo piegato e un segno Ottone, su fondo Inchiostro; tre colori pieni. Sorgente nell'appendice A6. Nella barra: marchio a 28 px e accanto "plico" in Poppins 600, senza punto (regola 55).
+101. **Marchio** [proposto] (regola 56), revisione 3: "il plico legato". Due fogli, quello dietro inclinato in grigio ardesia #5F7280 e quello davanti in Nebbia, legati da un tratto a mano color Ottone che fa un occhiello al posto del nodo; fondo Inchiostro. Unisce le due idee dell'app: il plico di carte e la scrittura a mano. Resta leggibile a 16 px. All'avvio i fogli compaiono e il tratto si disegna. Sorgente nell'appendice A6. Nella barra: marchio a 28 px e accanto "plico" in Poppins 600, senza punto (regola 55).
 102. **Movimento** (regola 62): solo passaggi fra viste e apertura di fogli e menu, 150 millisecondi; tutto spento con "riduci movimento".
 
 ## H. Dati
@@ -375,8 +404,13 @@ Riferimento visivo: canvas "Mock-up plico 2" (https://claude.ai/artifact/U3dN6Pe
 // tipo 'evidenzia' (dalla 2.2): evidenziazione agganciata al testo
 { colore: '#F5DE8C', riquadri: [[x0, y0, x1, y1]] }
 
-// tipo 'testo' (dalla 2.2)
+// tipo 'testo' (2.2): rett in punti PDF, y1 = bordo alto; altezza = righe x 1,35 x corpo, come il FreeText di pdf.js
 { colore: '#0E1D2A', corpo: 12, testo: 'Nota', rett: [x0, y0, x1, y1] }
+
+// tipo 'immagine' (2.2): dati = data URL JPEG o PNG, al massimo 1600 px per lato
+{ dati: 'data:image/jpeg;base64,...', rett: [x0, y0, x1, y1] }
+
+// in tutti, facoltativo: gruppo = id comune ai tratti di una firma; nei tratti delle forme: forma = 'linea' | 'freccia' | 'rettangolo' | 'ellisse'
 ```
 
 106. **Dal segno al contorno** [fatto]: il contorno pieno di un tratto si calcola con perfect-freehand sui punti moltiplicati per `scala`, poi si riporta in punti PDF. Parametri unici per schermo e PDF: `size` = 0,755 x spessore x scala per la penna (spessore x scala per evidenziatore e forme), `thinning` 0,63 per la penna (0 per gli altri), `smoothing` 0,5, `streamline` 0,15, `simulatePressure: false`, `last: true`. Codice: `poligonoDi` nell'appendice A1.
@@ -402,13 +436,14 @@ Riferimento visivo: canvas "Mock-up plico 2" (https://claude.ai/artifact/U3dN6Pe
 | Penna, forme | Stamp con contorni pieni: una per pagina e per colore | Opaca, come l'inchiostro. Anche 500 tratti stanno in 2-3 annotazioni |
 | Evidenziatore a mano | Ink con intento InkHighlight: una per tratto | Fusione "moltiplica": il testo resta leggibile sotto |
 | Evidenziazione del testo (2.2) | Highlight con QuadPoints | Fusione "moltiplica" |
-| Testo (2.2) | FreeText in Helvetica | Accenti e simbolo dell'euro verificati |
+| Testo (2.2) | FreeText in Helvetica | Accenti e simbolo dell'euro verificati [fatto: anche con Poppler] |
+| Immagine (2.2) | Stamp con la bitmap (`bitmapId`, `bitmap`) | Sotto i tratti di penna |
 
 112. **Cosa rilegge plico**: non le annotazioni, ma il blocco plico, che contiene i segni completi (punti, pressione, strumento, lapidi). Per questo i segni tornano modificabili su un altro dispositivo.
 113. **Ricomporre non accumula** [fatto]: si compone sempre dall'originale, quindi il file non cresce salvando più volte.
 114. **Se un'altra app modifica il file**: il blocco plico non si trova più alla posizione dichiarata, oppure dopo di esso c'è più di un "%%EOF". plico allora tiene il file intero come nuovo originale: i segni di prima restano visibili ma non sono più modificabili.
 115. **Nessun segno**: il file composto è l'originale, senza blocco.
-116. **Ordine dentro la pagina**: prima le evidenziazioni, poi i tratti di penna, poi il testo. Lo stesso ordine vale a schermo.
+116. **Ordine dentro la pagina**: prima le evidenziazioni, poi le immagini, poi i tratti di penna e le forme, poi il testo. Lo stesso ordine vale a schermo.
 117. **Codice di riferimento**: `componi` e `scomponi` nell'appendice A2. Sono stati provati e vanno usati così come sono.
 
 ### H4. Copia di sicurezza
@@ -450,8 +485,11 @@ src/
   42-zip.js             appendice A4
   50-libreria.js
   60-documento.js       visore, Lettura, barre, ricerca
-  65-scrittura.js       tele, ingressi, strumenti, annulla
+  65-scrittura.js       tele, ingressi, penna, evidenziatore, gomma, forme, annulla, barra
+  66-strumenti.js       testo, Seleziona, evidenziatore agganciato al testo, immagini, firma (2.2)
+  67-pagine.js          pannello Pagine (2.2)
   70-impostazioni.js    impostazioni, guida, copia di sicurezza
+  72-penna.js           prova della penna, percorso #penna (2.2)
   78-dropbox.js         client Dropbox: collegamento, chiamate, caricamento a pezzi
   80-sync.js            giro di sincronizzazione e stato
   90-avvio.js           percorsi, splash, service worker, aggiornamento
@@ -481,7 +519,10 @@ docs/                   questo documento, handoff, memoria-office-pdf.md
 | `42-zip.js` | Copia | `creaZip(voci)`, `leggiZip(file)` |
 | `50-libreria.js` | Libreria | `mostraLibreria(vista)`, `importa(file)`, `nuovoVuoto(stile)` |
 | `60-documento.js` | Documento | `apri(id)`, `chiudi()`, `stato(nuovo)`, `cerca(testo)`, `vaiA(pagina)` |
-| `65-scrittura.js` | Scrittura | `attiva(visore)`, `disattiva()`, `strumento(nome)`, `annulla()`, `ripeti()` |
+| `65-scrittura.js` | Scrittura | `attiva(visore)`, `disattiva()`, `strumento(nome)`, `annulla()`, `ripeti()`, `aggiungiSegni(nuovi, tolti)`, registro `EXTRA` |
+| `66-strumenti.js` | Strumenti 2.2 | si registra in `EXTRA`: `testo`, `seleziona`, `evidenziaTesto`, `inserisci` |
+| `67-pagine.js` | Pagine | `apriPannello()` |
+| `72-penna.js` | Prova della penna | `mostraPenna()` |
 | `70-impostazioni.js` | Impostazioni | `mostraImpostazioni()`, `esportaTutto()`, `importaCopia(file, modo)` |
 | `90-avvio.js` | Avvio | percorsi `#libreria`, `#doc-{id}`, `#impostazioni`, `#guida` |
 
@@ -546,10 +587,10 @@ div.page (pdf.js)
 canvas.tela-viva       una sola, sopra tutto il visore, per il tratto in corso
 ```
 
-135b. **Tele e memoria**: le tele esistono solo per le pagine che pdf.js tiene disegnate. Quando pdf.js libera una pagina (evento `pagerender` con pagina azzerata, oppure la pagina perde il suo `canvasWrapper`), plico porta le sue tele a `width = 0` e `height = 0` e le dimentica. Ogni tela si ricrea al successivo `pagerendered`.
+135b. **Tele e memoria** (revisione 3): le tele stanno dentro il `canvasWrapper` di pdf.js ed esistono solo per le pagine in vista, al massimo 3, con al massimo 8 milioni di pixel ciascuna. A ogni scorrimento, disegno o cambio di scala plico crea le tele delle pagine in vista e porta a `width = 0` quelle di tutte le altre. Su tablet e telefono (`pointer: coarse`) anche pdf.js usa al massimo 8 milioni di pixel per pagina. [fatto: con 50 pagine scorse, mai più di 3 tele]
 136. **Misura delle tele**: stessi pixel del canvas di pdf.js (`pageView.canvas.width` e `height`), larghezza e altezza CSS al 100% della pagina. Così durante l'ingrandimento seguono la pagina e a fine gesto vengono ridisegnate nitide.
 137. **Disegno**: `ctx.setTransform(sx, 0, 0, sy, 0, 0)` con `sx = canvas.width / viewport.width`, poi `ctx.transform(...viewport.transform)`; da lì i contorni si disegnano direttamente in punti PDF, con `fill()`.
-138. **Tratto in corso**: a ogni fotogramma si ricalcola il contorno di tutto il tratto e si ridisegna sulla tela viva (come nella prova tecnica). Al rilascio il tratto passa alla tela della pagina e la tela viva si pulisce. La tela viva usa `getContext('2d', { desynchronized: true })` [da verificare: se sfarfalla, si toglie l'opzione].
+138. **Tratto in corso**: a ogni fotogramma si ricalcola il contorno di tutto il tratto e si ridisegna sulla tela viva (come nella prova tecnica). Al rilascio il tratto passa alla tela della pagina e la tela viva si pulisce. La tela viva usa un contesto normale: l'opzione `desynchronized` è tolta nella revisione 3, perché su Chrome per Android può mostrare nera la tela trasparente.
 139. **Una pagina per tratto**: il tratto appartiene alla pagina dove inizia e viene ritagliato ai suoi bordi.
 140. **Ingressi in Scrittura**: il contenitore del visore ha `touch-action: none` e `user-select: none`; `textLayer` e `annotationLayer` hanno `pointer-events: none`. Si usano gli eventi `pointerdown`, `pointermove`, `pointerup`, `pointercancel` sul contenitore; la pagina si trova con `elementFromPoint(x, y).closest('.page')`.
 141. **Un dito che scorre** (Scrittura con penna): scorrimento a mano con inerzia: velocità misurata sugli ultimi 100 millisecondi; al rilascio, se supera 0,3 px per millisecondo, la pagina continua a scorrere perdendo il 5% di velocità a fotogramma, finché non scende sotto 0,02 o arriva un nuovo tocco.
@@ -694,7 +735,7 @@ object-src 'none'; base-uri 'none'; form-action 'self'
 ### M4. Fasi successive
 
 179. **Fase 2 - plico 2.1**: Dropbox (sezione L): collegamento, giro di sincronizzazione, conflitti, Solo con Wi-Fi, stato nel pannello e nelle Impostazioni. Storia S7, provata in automatico con un Dropbox finto; con quello vero dopo la chiave.
-180. **Fase 3 - plico 2.2**, strumenti avanzati: Seleziona (sposta, ridimensiona, cambia colore, copia, elimina); Forme (linea, freccia, rettangolo, ellisse, tracciate trascinando); Testo; Firma e immagini; evidenziatore agganciato al testo; pannello Pagine con miniature e, per ogni PDF, aggiungi, sposta, elimina; selezione multipla in libreria; doppio tocco per ingrandire; tocco con due dita per annullare; diagnostica della penna.
+180. **Fase 3 - plico 2.2** [fatto il 15/11/2026 insieme alla 2.0], strumenti avanzati: Seleziona (sposta, ridimensiona, cambia colore, copia, elimina); Forme (linea, freccia, rettangolo, ellisse, tracciate trascinando); Testo; Firma e immagini; evidenziatore agganciato al testo; pannello Pagine con miniature e, per ogni PDF, aggiungi, sposta, elimina; selezione multipla in libreria; doppio tocco per ingrandire; tocco con due dita per annullare; diagnostica della penna.
 181. **Fase 4 - plico 2.3**, extra: moduli compilabili; ricerca nel testo di tutta la libreria; altri cloud; cartella "Da importare" su Dropbox; eventuale versione nativa (regola 86).
 
 ### M5. Storie d'uso come collaudo (regola 36)
@@ -1068,15 +1109,15 @@ console.log(`plico ${versione} - index.html ${(Buffer.byteLength(html) / 1024).t
 ```
 <!-- fine:build.mjs -->
 
-### A6. Marchio provvisorio
+### A6. Marchio provvisorio: il plico legato (revisione 3)
 
 <!-- inizio:icone/plico.svg -->
 ```xml
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="plico">
   <rect width="64" height="64" rx="14" fill="#0E1D2A"/>
-  <path d="M21 11h15l10 10v30a2 2 0 0 1-2 2H21a2 2 0 0 1-2-2V13a2 2 0 0 1 2-2z" fill="#E9EDEC"/>
-  <path d="M36 11v8a2 2 0 0 0 2 2h8z" fill="#CAD2D2"/>
-  <path d="M24 41c3-7 6-7 7-1s3 7 6 0 4-5 6-2" fill="none" stroke="#C99A4E" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="15" y="12" width="31" height="41" rx="3.5" fill="#5F7280" transform="rotate(-10 30.5 32.5)"/>
+  <rect x="18" y="11" width="31" height="41" rx="3.5" fill="#E9EDEC" transform="rotate(4 33.5 31.5)"/>
+  <path d="M8.5 37.5c8.5-3 17.5 1.8 26.5-.4 4.6-1.1 9-5.2 7.4-8.1-1.8-3.2-7.8.6-5.2 5.3 2.4 4.4 9.6 4.9 18.3 1.2" fill="none" stroke="#C99A4E" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
 ```
 <!-- fine:icone/plico.svg -->
@@ -1085,6 +1126,6 @@ console.log(`plico ${versione} - index.html ${(Buffer.byteLength(html) / 1024).t
 
 - **A cosa serve**: plico apre i tuoi PDF, te li fa leggere e ti lascia scriverci sopra a mano. I documenti restano su questo dispositivo.
 - **Come funziona**: importa un PDF con il +. Tocca un documento per leggerlo. Tocca Scrivi per usare penna, evidenziatore e gomma; tocca Leggi per tornare alla lettura. Con una penna, come la S Pen, la penna scrive e il dito scorre. Ogni segno si salva da solo.
-- **Opzioni**: tocca di nuovo lo strumento attivo per cambiare colore e spessore. Tieni ferma la penna a fine tratto per avere una linea dritta. Nelle Impostazioni scegli il tema e il lato della barra.
+- **Opzioni**: tocca di nuovo lo strumento attivo per cambiare colore e spessore. Tieni ferma la penna a fine tratto per avere una linea dritta. Con Testo scrivi con la tastiera; con Forme tracci linee, frecce, rettangoli ed ellissi; con Seleziona sposti, ridimensioni, copi o elimini i segni. Dal menu inserisci un'immagine o la tua firma; da Pagine aggiungi, sposti o elimini pagine. Nella libreria tieni premuto un documento per sceglierne più di uno. Doppio tocco per ingrandire, tocco con due dita per annullare.
 - **Esempio**: ti arriva un modulo. Condividi > plico, firmi, poi Condividi per rimandarlo. Chi lo riceve vede la firma con qualsiasi lettore PDF.
 - **Attenzione**: i documenti vivono nel browser di questo dispositivo: se cancelli i dati del sito o disinstalli l'app, li perdi. Esporta ogni tanto una copia di sicurezza dalle Impostazioni. Su iPhone il sistema può svuotare l'archivio dopo un lungo periodo senza uso. plico non modifica il testo dei PDF e non apre file Word, Excel o PowerPoint: esportali in PDF dall'app che li ha creati.

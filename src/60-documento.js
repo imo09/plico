@@ -89,8 +89,27 @@ export function ingrandisci(fattore, origine) {
   D.v.updateScale({ scaleFactor: nuova / D.v.currentScale, origin: origine, drawingDelay: 400 });
 }
 // due dita in Lettura (punto 143): touch non passivi; con due tocchi si ingrandisce
+// doppio tocco (2.2): ingrandisce al doppio attorno al punto, oppure torna alla misura iniziale
+let ultimoTocco = null;
+export function toccoDoppio(x, y) {
+  const ora = performance.now(), u = ultimoTocco;
+  ultimoTocco = { ora, x, y };
+  if (!u || ora - u.ora > 320 || Math.hypot(x - u.x, y - u.y) > 30 || !D.v) return false;
+  ultimoTocco = null;
+  const base = D.scalaBase || D.v.currentScale;
+  if (D.v.currentScale > base * 1.3) D.v.currentScaleValue = stretta() ? 'page-width' : 'auto';
+  else D.v.updateScale({ scaleFactor: limita(base * 2, MIN, MAX) / D.v.currentScale, origin: [x, y], drawingDelay: 200 });
+  return true;
+}
 function gestoLettura(c) {
-  let g = null;
+  let g = null, tocco = null;
+  c.addEventListener('pointerdown', e => { if (e.pointerType === 'touch' && D.stato === 'lettura' && e.isPrimary) tocco = { x: e.clientX, y: e.clientY, t: performance.now() }; else tocco = null; });
+  c.addEventListener('pointerup', e => {
+    if (!tocco || e.pointerType !== 'touch' || D.stato !== 'lettura') return;
+    if (performance.now() - tocco.t < 250 && Math.hypot(e.clientX - tocco.x, e.clientY - tocco.y) < 10) toccoDoppio(e.clientX, e.clientY);
+    tocco = null;
+  });
+  c.addEventListener('pointercancel', () => { tocco = null; });
   const dist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
   const centro = t => [(t[0].clientX + t[1].clientX) / 2, (t[0].clientY + t[1].clientY) / 2];
   c.addEventListener('touchstart', e => {
@@ -154,6 +173,7 @@ function menuAperto(ancora) {
   menu(ancora, [
     { testo: 'Cerca nel testo', icona: 'lente', fai: cerca },
     { testo: 'Vai alla pagina', icona: 'vai', valore: D.v ? D.v.currentPageNumber + ' di ' + D.doc.numPages : '', fai: vaiAPagina },
+    { testo: 'Pagine', icona: 'pagine', fai: () => emetti('azione:pagine') },
     s.origine === 'vuoto' ? { testo: 'Aggiungi pagina', icona: 'piu', fai: aggiungiPagina } : null,
     { separatore: true },
     { testo: 'Rinomina', icona: 'rinomina', fai: rinominaAperto },
@@ -225,11 +245,12 @@ export async function apri(idd, { ricarica = false } = {}) {
   const link = new visore.PDFLinkService({ eventBus: D.bus, externalLinkTarget: visore.LinkTarget.BLANK, externalLinkRel: 'noopener noreferrer nofollow' });
   const trova = new visore.PDFFindController({ eventBus: D.bus, linkService: link });
   D.v = new visore.PDFViewer({ container: contenitore, viewer: contenitore.firstChild, eventBus: D.bus, linkService: link, findController: trova,
-    textLayerMode: 1, annotationMode: pdfjs.AnnotationMode.ENABLE, annotationEditorMode: pdfjs.AnnotationEditorType.DISABLE, removePageBorders: true, maxCanvasPixels: 16777216 });
+    textLayerMode: 1, annotationMode: pdfjs.AnnotationMode.ENABLE, annotationEditorMode: pdfjs.AnnotationEditorType.DISABLE, removePageBorders: true, maxCanvasPixels: matchMedia('(pointer: coarse)').matches ? 8388608 : 16777216 });   // revisione 3: meno memoria grafica su tablet e telefono
   link.setViewer(D.v);
   D.link = link; D.trova = trova;
   D.bus.on('pagesinit', () => {
     D.v.currentScaleValue = stretto ? 'page-width' : 'auto';
+    D.scalaBase = D.v.currentScale;
     const p = limita(s.pagina || 1, 1, D.doc.numPages);
     if (p > 1) D.v.currentPageNumber = p; else contenitore.scrollTop = 0;   // la prima pagina col suo margine in alto
     aggiornaIndicatore();
@@ -269,7 +290,7 @@ export async function chiudi({ silenzioso = false } = {}) {
   const compito = D.compito;
   try { D.v?.setDocument(null); D.link?.setDocument(null); D.trova?.setDocument(null); } catch {}
   D.v = null; D.doc = null; D.compito = null; D.bus = null; D.aperto = false; D.scheda = null; D.segni = []; D.password = null; D.radice = null; D.contenitore = null;
-  if (compito) { try { await compito.destroy(); } catch {} }
+  if (compito) setTimeout(() => compito.destroy().catch(() => {}), 800);   // il visore vecchio finisce le letture in corso, poi si libera (niente errori "Transport destroyed")
   if (s && !silenzioso) emetti('documento:chiuso', { id: s.id, password });
 }
 ascolta('libreria:cambiata', ({ doc } = {}) => {   // un cambio dalla sincronizzazione o da un menu: tieni aggiornato il titolo

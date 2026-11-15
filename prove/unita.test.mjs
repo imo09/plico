@@ -76,3 +76,25 @@ test('zip: andata e ritorno, nomi con accenti', async () => {
   assert.deepEqual(v.map(x => x.nome), ['libreria.json', 'Documenti/Perché è così - abcdefgh.pdf']);
   assert.deepEqual(Array.from(await v[1].leggi()), [1, 2, 3]);
 });
+
+import { forma, trasforma, rettDiTutti, intersecano, rettDi } from '../src/36-segni.js';
+test('forme: rettangolo chiuso, ellisse, freccia con la punta', () => {
+  const r = forma('rettangolo', [0, 0], [10, 20]);
+  assert.equal(r[0], 0); assert.equal(r[1], 0); assert.equal(r[r.length - 3], 0); assert.equal(r[r.length - 2], 0);
+  const e = forma('ellisse', [0, 0], [20, 10]); assert.ok(e.length / 3 >= 24);
+  const f = forma('freccia', [0, 0], [30, 0]); assert.ok(f.length > forma('linea', [0, 0], [30, 0]).length);
+});
+test('trasforma: sposta e ridimensiona punti, spessore, testo e riquadri', () => {
+  const s = segno('m1', 1);
+  const t = trasforma(s, { dx: 5, dy: -5 });
+  assert.equal(t.punti[0], 15); assert.equal(t.punti[1], 5); assert.equal(t.id, 'm1'); assert.equal(s.punti[0], 10);
+  const k = trasforma(s, { k: 2, ax: 10, ay: 10 }); assert.equal(k.punti[3], 30.5); assert.equal(k.spessore, 3.6);
+  const tx = trasforma({ tipo: 'testo', corpo: 12, rett: [0, 0, 10, 10] }, { k: 1.5 }); assert.equal(tx.corpo, 18); assert.deepEqual(tx.rett, [0, 0, 15, 15]);
+  assert.deepEqual(trasforma({ tipo: 'evidenzia', riquadri: [[0, 0, 1, 1]] }, { dx: 1 }).riquadri, [[1, 0, 2, 1]]);
+});
+test('riquadri dei segni', () => {
+  const r = rettDiTutti([{ rett: [0, 0, 1, 1] }, { rett: [5, 5, 6, 7] }]);
+  assert.deepEqual(r, [0, 0, 6, 7]);
+  assert.equal(intersecano([0, 0, 1, 1], [2, 2, 3, 3]), false);
+  assert.equal(intersecano(rettDi({ rett: [0, 0, 2, 2] }), [1, 1, 3, 3]), true);
+});

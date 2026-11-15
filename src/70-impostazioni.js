@@ -1,6 +1,6 @@
 // Impostazioni, Guida, copia di sicurezza (Esporta tutto, Importa una copia), promemoria.
 import { $, el, data, peso, numero, nomePulito, dataFile, scarica, stretta, emetti, ascolta, sha16 } from './20-base.js';
-import { icona, bottoneIcona, foglio, avviso, conferma, scegli, interruttore, segmenti, indietro } from './25-interfaccia.js';
+import { icona, bottoneIcona, foglio, avviso, conferma, scegli, interruttore, segmenti, indietro, vai } from './25-interfaccia.js';
 import { leggi, tutti, insieme, segniDi, togliSegniDi, spazio, protetto, proteggi } from './30-archivio.js';
 import { pulito } from './36-segni.js';
 import { unisciSchede, unisciRecord, unisciSegni, pubblica, pubblicaCartella } from './37-unione.js';
@@ -15,7 +15,7 @@ export const sezioniExtra = [];   // 80-sync.js aggiunge qui la sezione Sincroni
 export const GUIDA = [
   ['A cosa serve', 'plico apre i tuoi PDF, te li fa leggere e ti lascia scriverci sopra a mano. I documenti restano su questo dispositivo.'],
   ['Come funziona', 'Importa un PDF con il +. Tocca un documento per leggerlo. Tocca Scrivi per usare penna, evidenziatore e gomma; tocca Leggi per tornare alla lettura. Con una penna, come la S Pen, la penna scrive e il dito scorre. Ogni segno si salva da solo.'],
-  ['Opzioni', 'Tocca di nuovo lo strumento attivo per cambiare colore e spessore. Tieni ferma la penna a fine tratto per avere una linea dritta. Nelle Impostazioni scegli il tema e il lato della barra.'],
+  ['Opzioni', 'Tocca di nuovo lo strumento attivo per cambiare colore e spessore. Tieni ferma la penna a fine tratto per avere una linea dritta. Con Testo scrivi con la tastiera; con Forme tracci linee, frecce, rettangoli ed ellissi; con Seleziona sposti, ridimensioni, copi o elimini i segni. Dal menu inserisci un\'immagine o la tua firma; da Pagine aggiungi, sposti o elimini pagine. Nella libreria tieni premuto un documento per sceglierne più di uno. Doppio tocco per ingrandire, tocco con due dita per annullare.'],
   ['Esempio', 'Ti arriva un modulo. Condividi > plico, firmi, poi Condividi per rimandarlo. Chi lo riceve vede la firma con qualsiasi lettore PDF.'],
   ['Attenzione', 'I documenti vivono nel browser di questo dispositivo: se cancelli i dati del sito o disinstalli l\'app, li perdi. Esporta ogni tanto una copia di sicurezza dalle Impostazioni. Su iPhone il sistema può svuotare l\'archivio dopo un lungo periodo senza uso. I documenti non si vedono nell\'Archivio del telefono: usa Condividi o Salva una copia, anche per stampare. plico regge PDF fino a 200 MB; uno molto grande si apre più lentamente e su un telefono con poca memoria Condividi può non riuscire. plico non modifica il testo dei PDF e non apre file Word, Excel o PowerPoint: esportali in PDF dall\'app che li ha creati.']
 ];
@@ -134,7 +134,10 @@ async function sezioni() {
     { id: 'scrittura', titolo: 'Scrittura', icona: 'penna', riassunto: 'Barra a ' + lato + ', raddrizza ' + (L.imp.raddrizza !== false ? 'acceso' : 'spento'), righe: () => [
       riga({ testo: 'Barra degli strumenti', sotto: 'Su tablet e PC', destra: segmenti([['destra', 'Destra'], ['sinistra', 'Sinistra']], lato, 'Barra degli strumenti', v => impostaL('latoBarra', v).then(ridisegna)) }),
       riga({ testo: 'Raddrizza tenendo premuto', sotto: 'Tieni ferma la penna a fine tratto', destra: interruttore(L.imp.raddrizza !== false, 'Raddrizza tenendo premuto', v => impostaL('raddrizza', v).then(ridisegna)) }),
-      riga({ testo: 'Linea dritta automatica', sotto: 'Per l\'evidenziatore', destra: interruttore(L.imp.lineaDritta !== false, 'Linea dritta automatica', v => impostaL('lineaDritta', v).then(ridisegna)) })] },
+      riga({ testo: 'Linea dritta automatica', sotto: 'Per l\'evidenziatore', destra: interruttore(L.imp.lineaDritta !== false, 'Linea dritta automatica', v => impostaL('lineaDritta', v).then(ridisegna)) }),
+      riga({ testo: 'Evidenziatore agganciato al testo', sotto: 'Se parti da una parola, segue le righe del testo', destra: interruttore(L.imp.agganciaTesto !== false, 'Evidenziatore agganciato al testo', v => impostaL('agganciaTesto', v).then(ridisegna)) }),
+      riga({ testo: 'Prova la penna', sotto: 'Pressione, inclinazione, tasto laterale', destra: azione('Apri', () => vai('#penna')) }),
+      L.imp.firma ? riga({ testo: 'Firma salvata', sotto: 'Su questo dispositivo', destra: azione('Cancella', async () => { await impostaL('firma', null); avviso('Firma cancellata'); ridisegna(); }) }) : null].filter(Boolean) },
     { id: 'aspetto', titolo: 'Aspetto', icona: 'aspetto', riassunto: 'Tema ' + { auto: 'automatico', chiaro: 'chiaro', scuro: 'scuro' }[tema], righe: () => [
       riga({ testo: 'Tema', destra: segmenti([['auto', 'Automatico'], ['chiaro', 'Chiaro'], ['scuro', 'Scuro']], tema, 'Tema', async v => { await impostaL('tema', v); applicaTema(v); ridisegna(); }) }),
       riga({ testo: 'Animazione di avvio', sotto: 'Spenta anche con "riduci movimento"', destra: interruttore(L.imp.splash !== false, 'Animazione di avvio', async v => { await impostaL('splash', v); try { localStorage.setItem('plico-splash', v ? 'si' : 'no'); } catch {} }) })] },

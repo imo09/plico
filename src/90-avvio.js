@@ -6,6 +6,7 @@ import { L, caricaLibreria, mostraVista, importa, puliziaAvvio, ridisegna } from
 import { D, apri, chiudi } from './60-documento.js';
 import { mostraImpostazioni, applicaTema } from './70-impostazioni.js';
 import { avviaSync } from './80-sync.js';
+import { mostraPenna } from './72-penna.js';
 
 // ---------- percorsi: #libreria, #preferiti, #cartelle, #cartella-{id}, #cestino, #doc-{id}, #impostazioni, #guida ----------
 let rottaInCorso = Promise.resolve();
@@ -17,6 +18,7 @@ function rotta() {
     if ((m = /^#doc-([a-z0-9]{8})$/.exec(h))) { await apri(m[1]); return; }
     if (D.aperto) await chiudi();
     if (h === '#impostazioni' || h === '#guida') { await mostraImpostazioni(h === '#guida' ? 'guida' : undefined); return; }
+    if (h === '#penna') { mostraPenna(); return; }
     if ((m = /^#cartella-([a-z0-9]{8})$/.exec(h))) { await mostraVista('cartella', m[1]); return; }
     if (h === '#preferiti') return mostraVista('preferiti');
     if (h === '#cartelle') return mostraVista('cartelle');
