@@ -45,7 +45,21 @@ const ICONE = {
   aspetto: 'M12 3.5a8.5 8.5 0 1 0 0 17z M3.5 12a8.5 8.5 0 1 0 17 0a8.5 8.5 0 1 0 -17 0',
   archivio: 'M4.5 7.5h15v12h-15z M3.5 4.5h17v3h-17z M10 11.5h4',
   guida: 'M3.5 12a8.5 8.5 0 1 0 17 0a8.5 8.5 0 1 0 -17 0 M9.6 9.4a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .9-1 1.5v.6 M12 16.8h.01',
-  lucchetto: 'M6.5 10.5h11v9h-11z M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5'
+  lucchetto: 'M6.5 10.5h11v9h-11z M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5',
+  testo: 'M5.5 7V5h13v2 M12 5v14 M9.5 19h5',
+  seleziona: 'M4.5 9V4.5H9 M15 4.5h4.5V9 M4.5 15v4.5H9 M12.5 12.5l7 2.8-2.9 1.3-1.3 2.9z',
+  forme: 'M4 10.5h7v7H4z M16.5 13.5a3.5 3.5 0 1 0 0-7a3.5 3.5 0 1 0 0 7',
+  immagine: 'M4 5h16v14H4z M7.5 10a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0 -3 0 M5 17l4.5-4 3 2.5L15.5 12 19 15.5',
+  firma: 'M3.5 16c2-3.2 3.8-8 5.6-8 1.9 0-1.1 8 1 8 1.6 0 2-3.5 3.7-3.5 1.4 0 .9 3 2.6 3 1.2 0 2-1 3.1-2 M3.5 20.5h17',
+  altri: 'M4.5 4.5h6v6h-6z M13.5 4.5h6v6h-6z M4.5 13.5h6v6h-6z M16.5 13.5v6 M13.5 16.5h6',
+  'forma-linea': 'M5 19L19 5',
+  'forma-freccia': 'M5 19L19 5 M11 5h8v8',
+  'forma-rettangolo': 'M4.5 6.5h15v11h-15z',
+  'forma-ellisse': 'M3.5 12a8.5 6 0 1 0 17 0a8.5 6 0 1 0 -17 0',
+  sposta: 'M12 3v18 M3 12h18 M9 6l3-3 3 3 M9 18l3 3 3-3 M6 9l-3 3 3 3 M18 9l3 3-3 3',
+  colore: 'M12 3.5c3 4 6 7 6 10.5a6 6 0 1 1-12 0c0-3.5 3-6.5 6-10.5z',
+  pagine: 'M7.5 3.5h9v14h-9z M5 6.5v14h9',
+  spunta: 'M4.5 4.5h15v15h-15z M8 12.5l3 3 5-6'
 };
 export function icona(nome, classe = 'ic') {
   const ns = 'http://www.w3.org/2000/svg';
@@ -54,9 +68,9 @@ export function icona(nome, classe = 'ic') {
   const p = document.createElementNS(ns, 'path'); p.setAttribute('d', ICONE[nome] || ICONE.documenti); s.append(p);
   return s;
 }
-export function marchio(px = 28) {
+export function marchio(px = 28) {   // il plico legato: due fogli e un tratto a mano color ottone (appendice A6)
   const t = document.createElement('template');
-  t.innerHTML = `<svg viewBox="0 0 64 64" width="${px}" height="${px}" aria-hidden="true" class="marchio"><rect width="64" height="64" rx="14" fill="#0E1D2A"/><path d="M21 11h15l10 10v30a2 2 0 0 1-2 2H21a2 2 0 0 1-2-2V13a2 2 0 0 1 2-2z" fill="#E9EDEC"/><path d="M36 11v8a2 2 0 0 0 2 2h8z" fill="#CAD2D2"/><path d="M24 41c3-7 6-7 7-1s3 7 6 0 4-5 6-2" fill="none" stroke="#C99A4E" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  t.innerHTML = `<svg viewBox="0 0 64 64" width="${px}" height="${px}" aria-hidden="true" class="marchio"><rect width="64" height="64" rx="14" fill="#0E1D2A"/><rect x="15" y="12" width="31" height="41" rx="3.5" fill="#5F7280" transform="rotate(-10 30.5 32.5)"/><rect x="18" y="11" width="31" height="41" rx="3.5" fill="#E9EDEC" transform="rotate(4 33.5 31.5)"/><path d="M8.5 37.5c8.5-3 17.5 1.8 26.5-.4 4.6-1.1 9-5.2 7.4-8.1-1.8-3.2-7.8.6-5.2 5.3 2.4 4.4 9.6 4.9 18.3 1.2" fill="none" stroke="#C99A4E" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   return t.content.firstChild;
 }
 export function bottoneIcona(nome, etichetta, azione, classe = 'bi') {

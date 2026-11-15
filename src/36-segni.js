@@ -95,3 +95,39 @@ export function linea(da, a, pressione, passo = 2) {
 }
 export function arrotonda(punti) { const o = new Float32Array(punti.length); for (let i = 0; i < punti.length; i++) o[i] = Math.round(punti[i] * 100) / 100; return o; }
 export function pulito(s) { const o = {}; for (const k in s) if (k[0] !== '_') o[k] = s[k]; return o; }   // senza le cache (_poligono, _rett)
+
+// ---- aggiunte della 2.2: forme, spostare e ridimensionare (strumento Seleziona) ----
+// punti di una forma tracciata trascinando da "a" a "b" (punti PDF), pressione costante
+export function forma(tipo, a, b, passo = 2) {
+  const [x0, y0] = a, [x1, y1] = b, out = [];
+  const tratto = (p, q) => { const n = Math.max(1, Math.ceil(Math.hypot(q[0] - p[0], q[1] - p[1]) / passo)); for (let i = out.length ? 1 : 0; i <= n; i++) out.push(p[0] + (q[0] - p[0]) * i / n, p[1] + (q[1] - p[1]) * i / n, 0.5); };
+  if (tipo === 'rettangolo') { tratto([x0, y0], [x1, y0]); tratto([x1, y0], [x1, y1]); tratto([x1, y1], [x0, y1]); tratto([x0, y1], [x0, y0]); }
+  else if (tipo === 'ellisse') {
+    const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, rx = Math.abs(x1 - x0) / 2, ry = Math.abs(y1 - y0) / 2;
+    const n = Math.max(24, Math.ceil(Math.PI * (rx + ry) / passo));
+    for (let i = 0; i <= n; i++) { const t = i / n * Math.PI * 2; out.push(cx + rx * Math.cos(t), cy + ry * Math.sin(t), 0.5); }
+  } else if (tipo === 'freccia') {
+    tratto([x0, y0], [x1, y1]);
+    const ang = Math.atan2(y1 - y0, x1 - x0), l = Math.min(14, Math.max(6, Math.hypot(x1 - x0, y1 - y0) * 0.3));
+    const p1 = [x1 - l * Math.cos(ang - 0.45), y1 - l * Math.sin(ang - 0.45)], p2 = [x1 - l * Math.cos(ang + 0.45), y1 - l * Math.sin(ang + 0.45)];
+    tratto([x1, y1], p1); tratto(p1, [x1, y1]); tratto([x1, y1], p2);
+  } else tratto([x0, y0], [x1, y1]);
+  return arrotonda(new Float32Array(out));
+}
+// copia del segno spostata di (dx, dy) e ridimensionata di k attorno ad (ax, ay); spessore e corpo seguono la scala
+export function trasforma(s, { dx = 0, dy = 0, k = 1, ax = 0, ay = 0 } = {}) {
+  const X = x => Math.round((ax + (x - ax) * k + dx) * 100) / 100, Y = y => Math.round((ay + (y - ay) * k + dy) * 100) / 100;
+  const o = pulito(s);
+  if (s.punti) { const p = new Float32Array(s.punti.length); for (let i = 0; i < p.length; i += 3) { p[i] = X(s.punti[i]); p[i + 1] = Y(s.punti[i + 1]); p[i + 2] = s.punti[i + 2]; } o.punti = p; }
+  if (s.spessore) o.spessore = Math.round(s.spessore * k * 100) / 100;
+  if (s.rett) { const [a, b, c, d] = s.rett; o.rett = [X(a), Y(b), X(c), Y(d)]; }
+  if (s.corpo) o.corpo = Math.round(s.corpo * k * 10) / 10;
+  if (s.riquadri) o.riquadri = s.riquadri.map(([a, b, c, d]) => [X(a), Y(b), X(c), Y(d)]);
+  return o;
+}
+export function rettDiTutti(lista) {   // rettangolo che contiene più segni
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const s of lista) { const r = rettDi(s); x0 = Math.min(x0, r[0]); y0 = Math.min(y0, r[1]); x1 = Math.max(x1, r[2]); y1 = Math.max(y1, r[3]); }
+  return [x0, y0, x1, y1];
+}
+export function intersecano(a, b) { return a[0] <= b[2] && a[2] >= b[0] && a[1] <= b[3] && a[3] >= b[1]; }

@@ -4,6 +4,7 @@
 // scomponi(file) -> { base, segni, plico }: se il file non viene da plico, base è il file intero e segni è vuoto
 import { poligonoDi, semplifica, asseDi, impacchetta, spacchetta } from './36-segni.js';
 import { getStroke } from './35-freehand.js';
+import { emetti } from './20-base.js';
 import { leggi, segniDi } from './30-archivio.js';
 const enc = new TextEncoder();
 async function comprimi(testo) {
@@ -58,6 +59,9 @@ export async function componi(pdfjs, base, segni, opzioni = {}) {
         const poli = contorno(s);
         metti({ ...comune, annotationType: T.HIGHLIGHT, rect: rettangolo([poli], 1), color: rgb(s.colore), opacity: 1, thickness: s.spessore, outlines: { outline: linea(poli), points: [asseDi(s)] } });
       }
+      for (const s of lista) if (s.tipo === 'immagine' && s.dati) {                   // 2b. immagini e firme in immagine (2.2): timbro con la bitmap
+        metti({ ...comune, annotationType: T.STAMP, bitmapId: 'plico_' + s.id, bitmap: await bitmapDa(s.dati), rect: s.rett, isSvg: false });
+      }
       const perColore = new Map();                                                    // 3. penna e forme: un timbro vettoriale per colore
       for (const s of lista) if (s.tipo === 'tratto' && s.strumento !== 'evidenziatore') { if (!perColore.has(s.colore)) perColore.set(s.colore, []); perColore.get(s.colore).push(contorno(s)); }
       for (const [colore, poli] of perColore) metti({ ...comune, annotationType: T.SIGNATURE, isSignature: true, areContours: true, rect: rettangolo(poli, 1), color: rgb(colore), thickness: 0, lines: poli.map(linea) });
@@ -68,6 +72,10 @@ export async function componi(pdfjs, base, segni, opzioni = {}) {
   } finally { await compito.destroy(); }
 }
 
+async function bitmapDa(dati) {   // data URL -> ImageBitmap, senza fetch (la regola di sicurezza non apre data: alle connessioni)
+  const [testa, b64] = dati.split(','), tipo = (/data:([^;]+)/.exec(testa) || [])[1] || 'image/png';
+  return createImageBitmap(new Blob([daBase64(b64)], { type: tipo }));
+}
 async function copiaBlob(blob, dest) {   // copia un Blob in un buffer già pronto, a pezzi, senza una seconda copia intera
   const r = blob.stream().getReader(); let pos = 0;
   for (;;) { const { done, value } = await r.read(); if (done) break; dest.set(value, pos); pos += value.length; }
@@ -163,8 +171,28 @@ export async function apriDocumento(blob, { chiediPassword } = {}) {
   return { compito, doc, password: () => password };
 }
 
+// immagini decodificate per lo schermo: quando una è pronta, chi disegna viene avvisato
+const IMMAGINI = new Map();
+export function immagineDi(dati) {
+  let v = IMMAGINI.get(dati);
+  if (!v) { const img = new Image(); v = { img, pronta: false }; IMMAGINI.set(dati, v); img.onload = () => { v.pronta = true; emetti('immagine:pronta'); }; img.src = dati; }
+  return v.pronta ? v.img : null;
+}
+export function precaricaImmagini(lista) {
+  return Promise.all(lista.filter(s => s.tipo === 'immagine' && !s.eliminato).map(s => new Promise(ok => { if (immagineDi(s.dati)) ok(); else { const v = IMMAGINI.get(s.dati); v.img.addEventListener('load', ok, { once: true }); v.img.addEventListener('error', ok, { once: true }); } })));
+}
+export const FONT_TESTO = 'Helvetica, Arial, "Liberation Sans", sans-serif';
+let misuratore = null;
+export function misuraTesto(testo, corpo) {   // in punti PDF, con le stesse regole del FreeText di pdf.js (interlinea 1,35)
+  misuratore ||= document.createElement('canvas').getContext('2d');
+  misuratore.font = corpo + 'px ' + FONT_TESTO;
+  const righe = String(testo).split('\n');
+  return { w: Math.max(4, ...righe.map(r => misuratore.measureText(r).width)) + 2, h: righe.length * 1.35 * corpo };
+}
 // disegna i segni di una pagina su un contesto: sx, sy = pixel della tela per px CSS del viewport
+// ordine (punto 116): evidenziazioni, immagini, penna e forme, testo
 export function disegnaSegni(ctx, lista, viewport, sx, sy, { evidenziatori = true, penne = true, miscela = false } = {}) {
+  const vivi = lista.filter(s => !s.eliminato && !s._nascosto);
   ctx.save();
   ctx.setTransform(sx, 0, 0, sy, 0, 0);
   ctx.transform(...viewport.transform);
@@ -177,10 +205,29 @@ export function disegnaSegni(ctx, lista, viewport, sx, sy, { evidenziatori = tru
   };
   if (evidenziatori) {
     if (miscela) ctx.globalCompositeOperation = 'multiply';
-    for (const s of lista) if (!s.eliminato && s.tipo === 'tratto' && s.strumento === 'evidenziatore') riempi(s);
+    for (const s of vivi) if (s.tipo === 'evidenzia') { ctx.fillStyle = s.colore; for (const [a, b, c, d] of s.riquadri) ctx.fillRect(a, b, c - a, d - b); }
+    for (const s of vivi) if (s.tipo === 'tratto' && s.strumento === 'evidenziatore') riempi(s);
     ctx.globalCompositeOperation = 'source-over';
   }
-  if (penne) for (const s of lista) if (!s.eliminato && s.tipo === 'tratto' && s.strumento !== 'evidenziatore') riempi(s);
+  ctx.restore();
+  if (!penne) return;
+  const inVista = (x, y) => viewport.convertToViewportPoint(x, y);
+  ctx.save(); ctx.setTransform(sx, 0, 0, sy, 0, 0);
+  for (const s of vivi) if (s.tipo === 'immagine') {
+    const img = immagineDi(s.dati); if (!img) continue;
+    const [a, b] = inVista(s.rett[0], s.rett[3]), [c, d] = inVista(s.rett[2], s.rett[1]);
+    ctx.drawImage(img, Math.min(a, c), Math.min(b, d), Math.abs(c - a), Math.abs(d - b));
+  }
+  ctx.restore();
+  ctx.save(); ctx.setTransform(sx, 0, 0, sy, 0, 0); ctx.transform(...viewport.transform);
+  for (const s of vivi) if (s.tipo === 'tratto' && s.strumento !== 'evidenziatore') riempi(s);
+  ctx.restore();
+  ctx.save(); ctx.setTransform(sx, 0, 0, sy, 0, 0);
+  for (const s of vivi) if (s.tipo === 'testo' && s.testo) {
+    const fs = s.corpo * viewport.scale, [x, y] = inVista(s.rett[0], s.rett[3]);
+    ctx.font = fs + 'px ' + FONT_TESTO; ctx.fillStyle = s.colore; ctx.textBaseline = 'alphabetic';
+    s.testo.split('\n').forEach((r, i) => ctx.fillText(r, x, y + fs + i * 1.35 * fs));
+  }
   ctx.restore();
 }
 
@@ -194,6 +241,7 @@ export async function miniatura(doc, segni) {
   const ctx = c.getContext('2d', { alpha: false });
   ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, c.width, c.height);
   await pagina.render({ canvasContext: ctx, canvas: c, viewport }).promise;
+  await precaricaImmagini((segni || []).filter(s => s.pagina === 0));
   disegnaSegni(ctx, (segni || []).filter(s => s.pagina === 0), viewport, c.width / viewport.width, c.height / viewport.height, { miscela: true });
   const b = await new Promise(r => c.toBlob(r, 'image/webp', 0.8));
   c.width = c.height = 0;

@@ -55,7 +55,7 @@ export function data(ms) {   // "Oggi 09:41", "Ieri", "12 nov", "12 nov 2025"
   return d.getDate() + ' ' + MESI[d.getMonth()] + (d.getFullYear() !== o.getFullYear() ? ' ' + d.getFullYear() : '');
 }
 export function dataFile(ms = Date.now()) { const d = new Date(ms); return d.getFullYear() + '-' + due(d.getMonth() + 1) + '-' + due(d.getDate()); }
-export function senzaAccenti(t) { return String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+export function senzaAccenti(t) { return String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
 export function nomePulito(nome) {   // nome sicuro per un file, su ogni sistema
   let s = String(nome || 'documento').replace(/[\u0000-\u001f\u007f/\\:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim();
   s = s.replace(/[. ]+$/, '').slice(0, 80).trim();

@@ -14,7 +14,7 @@ export class ErroreDropbox extends Error {
 const b64url = b => btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 function casuale(n) { const c = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~', a = crypto.getRandomValues(new Uint8Array(n)); let s = ''; for (const x of a) s += c[x % c.length]; return s; }
 // punto 163: nell'intestazione Dropbox-API-Arg i caratteri non ASCII vanno scritti come \uXXXX
-export const argomento = o => JSON.stringify(o).replace(/[\u007f-￿]/g, c => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'));
+export const argomento = o => JSON.stringify(o).replace(/[\u007f-\uffff]/g, c => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'));
 
 export async function collega() {
   const verifier = casuale(64), state = casuale(24);

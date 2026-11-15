@@ -1,6 +1,6 @@
 // Riferimento: genera un PDF A4 vuoto (bianco, righe, quadretti) senza librerie.
-export function pdfVuoto(pagine = 1, stile = 'bianco') {
-  const L = 595.28, A = 841.89, n2 = v => v.toFixed(2);
+export function pdfVuoto(pagine = 1, stile = 'bianco', misura = [595.28, 841.89]) {   // revisione 3: misura della pagina facoltativa
+  const [L, A] = misura, n2 = v => v.toFixed(2);
   let c = '';
   if (stile === 'righe') { c = '0.79 0.82 0.82 RG 0.5 w\n'; for (let y = A - 85; y > 42; y -= 24) c += `42.5 ${n2(y)} m ${n2(L - 42.5)} ${n2(y)} l S\n`; }
   if (stile === 'quadretti') { const p = 14.173; c = '0.86 0.89 0.89 RG 0.4 w\n'; for (let x = p; x < L - 1; x += p) c += `${n2(x)} 0 m ${n2(x)} ${n2(A)} l S\n`; for (let y = A - p; y > 1; y -= p) c += `0 ${n2(y)} m ${n2(L)} ${n2(y)} l S\n`; }
