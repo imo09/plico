@@ -556,4 +556,3 @@ export async function mostraVista(vista, cartella = null) {
   if (vista !== 'tutti') L.cerca = '';
   mostraLibreria();
 }
-export { dataFile };

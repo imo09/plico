@@ -197,7 +197,10 @@ function chiudiTratto(annullato = false) {
 
 function giu(e) {
   if (!S.attivo || !D.aperto) return;
-  if (e.pointerType === 'pen') { S.ultimaPenna = performance.now(); S.pennaGiu = true; }
+  if (e.pointerType === 'pen') {
+    S.ultimaPenna = performance.now(); S.pennaGiu = true;
+    if (!L.imp.haPenna) impostaL('haPenna', true).then(disegnaBarra);   // plico ha visto una penna (punto 58)
+  }
   if (S.opzioni) chiudiOpzioni();
   if (e.pointerType === 'touch') {
     if (pennaVicina()) { e.preventDefault(); return; }                         // palmo (punto 64)
@@ -408,6 +411,12 @@ D.strumenti = {
   disattiva() { if (S.tratto) chiudiTratto(); S.attivo = false; if (S.barra) S.barra.hidden = true; chiudiOpzioni(); fermaInerzia(); },
   iniziaDa(e) { if (S.attivo && !S.tratto && e.pointerType === 'pen') iniziaTratto(e); },
   paginaPronta, tasto, salvaOra,
+  aggiornaSegni(lista) {   // segni arrivati dalla sincronizzazione mentre il documento è aperto
+    const per = new Map(D.segni.map(s => [s.chiave, s]));
+    for (const s of lista) per.set(s.chiave, s);
+    D.segni = [...per.values()];
+    for (const i of new Set(lista.map(s => s.pagina))) ridisegnaPagina(i);
+  },
   scalaCambiata() { if (S.tratto && !S.tratto.gomma) chiudiTratto(); },
   async chiudi() {
     if (S.tratto) chiudiTratto();
@@ -418,4 +427,3 @@ D.strumenti = {
     if (S.errore) { S.errore(); S.errore = null; }
   }
 };
-export { tocca };

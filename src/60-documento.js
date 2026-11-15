@@ -14,11 +14,10 @@ const MIN = 0.5, MAX = 5;
 export const stratoLettura = () => D.stato === 'lettura';
 export function vistaPagina(n) { return D.v?.getPageView(n); }   // n da 0
 
-function mostraSalvataggio(salvando) {
+export function mostraSalvataggio(salvando) {
   const n = D.radice?.querySelector('.salvataggio'); if (!n) return;
   n.replaceChildren(icona(salvando ? 'attesa' : 'fatto'), el('span', { testo: salvando ? 'Salvataggio in corso' : 'Salvato' }));
 }
-export { mostraSalvataggio };
 
 function aggiornaIndicatore() {
   const b = D.radice?.querySelector('.indicatore'); if (!b || !D.v) return;
@@ -276,4 +275,3 @@ export async function chiudi({ silenzioso = false } = {}) {
 ascolta('libreria:cambiata', ({ doc } = {}) => {   // un cambio dalla sincronizzazione o da un menu: tieni aggiornato il titolo
   if (D.aperto && doc === D.scheda?.id && D.radice) { const t = D.radice.querySelector('.titolo'); if (t) t.textContent = D.scheda.nome; }
 });
-export { numero };
